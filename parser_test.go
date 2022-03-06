@@ -1,6 +1,7 @@
 package seimei_test
 
 import (
+	"errors"
 	"github.com/glassmonkey/seimei"
 	"github.com/google/go-cmp/cmp"
 	"testing"
@@ -21,5 +22,14 @@ func TestNameParser_Parse(t *testing.T) {
 	}
 	if diff := cmp.Diff(got, want); diff != "" {
 		t.Errorf("divided name mismatch (-got +want):\n%s", diff)
+	}
+}
+
+func TestNameParser_Parse_Validate(t *testing.T) {
+	sut := seimei.NewNameParser()
+	_, err := sut.Parse("あ")
+	wantErr := seimei.ErrTextLength
+	if !errors.Is(err, wantErr) {
+		t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, wantErr)
 	}
 }

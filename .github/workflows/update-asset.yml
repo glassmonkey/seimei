@@ -1,7 +1,7 @@
 on:
   push:
-  #  paths:
-  #    - 'namedivider-python/**'
+    paths:
+      - 'namedivider-python/**'
 name: update-assets
 jobs:
   test:

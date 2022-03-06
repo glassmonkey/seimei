@@ -2,19 +2,23 @@ package seimei
 
 import "fmt"
 
+//nolint:unparam
 func initNameParser(parseString string) (NameParser, error) {
 	return NewNameParser(parseString), nil
 }
 
-func Run(name string, parseString string) error {
+func Run(fullname string, parseString string) error {
 	p, err := initNameParser(parseString)
 	if err != nil {
 		return err
 	}
-	n, err := p.Parse(name)
+
+	name, err := p.Parse(fullname)
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%s\n", n.String())
+
+	fmt.Printf("%s\n", name.String())
+
 	return nil
 }

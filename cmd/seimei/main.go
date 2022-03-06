@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/glassmonkey/seimei"
 	"os"
+
+	"github.com/glassmonkey/seimei"
 )
 
 func main() {

@@ -1,0 +1,18 @@
+linters-settings:
+  govet:
+    check-shadowing: false
+  golint:
+    min-confidence: 0
+  gocyclo:
+    min-complexity: 30
+  maligned:
+    suggest-new: true
+  misspell:
+    locale: US
+
+
+linters:
+  enable-all: true
+  disable:
+    - forbidigo
+    - ifshort

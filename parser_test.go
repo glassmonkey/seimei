@@ -15,7 +15,7 @@ func TestNameParser_Parse(t *testing.T) {
 		FirstName: "太郎",
 		Separator: " ",
 		Score: 0,
-		Algorithm: "",
+		Algorithm: seimei.Dummy,
 	}
 	if err != nil {
 		t.Errorf("error is not nil, err=%v", err)
@@ -42,7 +42,7 @@ func TestNameParser_Parse_SingleFirstNameAndSingleLastName(t *testing.T) {
 		FirstName: "一",
 		Separator: " ",
 		Score: 0,
-		Algorithm: "rule",
+		Algorithm: seimei.Rule,
 	}
 	if err != nil {
 		t.Errorf("error is not nil, err=%v", err)

@@ -7,6 +7,13 @@ import (
 	"unicode/utf8"
 )
 
+type Algorithm string
+
+const (
+	Rule = Algorithm("rule")
+	Dummy = Algorithm("dummy")
+)
+
 var (
 	ErrTextLength = errors.New("name length needs at least 2 chars")
 )
@@ -43,7 +50,7 @@ func(n NameParser) Parse(fullname string) (DividedName, error) {
 		LastName: "田中",
 		Separator: n.Separator,
 		Score: 0,
-		Algorithm: "",
+		Algorithm: Dummy,
 	}, nil
 }
 
@@ -65,7 +72,7 @@ func (n NameParser) parseByRule(fullname string) (DividedName, error) {
 			LastName: string([]rune(fullname)[0:1]),
 			Separator: n.Separator,
 			Score: 0,
-			Algorithm: "rule",
+			Algorithm: Rule,
 		}, nil
 	}
 	 return DividedName{}, nil
@@ -76,7 +83,7 @@ type DividedName struct {
 	LastName string
 	Separator string
 	Score float64
-	Algorithm string
+	Algorithm Algorithm
 }
 
 func (n DividedName) String() string {

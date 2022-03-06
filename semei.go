@@ -3,7 +3,7 @@ package seimei
 import "fmt"
 
 func initNameParser() (NameParser, error) {
-	return NameParser{}, nil
+	return NewNameParser(), nil
 }
 
 func Run(name string) error {
@@ -15,6 +15,6 @@ func Run(name string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%s %s\n", n.FirstName, n.LastName)
+	fmt.Printf("%s\n", n.String())
 	return nil
 }

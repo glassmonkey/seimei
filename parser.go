@@ -23,10 +23,10 @@ type NameParser struct {
 	Re *regexp.Regexp
 }
 
-func NewNameParser() NameParser {
+func NewNameParser(parserString string) NameParser {
 	re := regexp.MustCompile(`\p{Han}+`)
 	return NameParser{
-		Separator: " ",
+		Separator: parserString,
 		Re: re,
 	}
 }

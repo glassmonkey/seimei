@@ -2,12 +2,12 @@ package seimei
 
 import "fmt"
 
-func initNameParser() (NameParser, error) {
-	return NewNameParser(), nil
+func initNameParser(parseString string) (NameParser, error) {
+	return NewNameParser(parseString), nil
 }
 
-func Run(name string) error {
-	p, err := initNameParser()
+func Run(name string, parseString string) error {
+	p, err := initNameParser(parseString)
 	if err != nil {
 		return err
 	}

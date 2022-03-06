@@ -8,12 +8,12 @@ import (
 )
 
 func TestNameParser_Parse(t *testing.T) {
-	sut := seimei.NewNameParser()
+	sut := seimei.NewNameParser("/")
 	got, err := sut.Parse("田中太郎")
 	want := seimei.DividedName{
 		LastName: "田中",
 		FirstName: "太郎",
-		Separator: " ",
+		Separator: "/",
 		Score: 0,
 		Algorithm: seimei.Dummy,
 	}
@@ -26,7 +26,7 @@ func TestNameParser_Parse(t *testing.T) {
 }
 
 func TestNameParser_Parse_Validate(t *testing.T) {
-	sut := seimei.NewNameParser()
+	sut := seimei.NewNameParser("/")
 	_, err := sut.Parse("あ")
 	wantErr := seimei.ErrTextLength
 	if !errors.Is(err, wantErr) {
@@ -35,12 +35,12 @@ func TestNameParser_Parse_Validate(t *testing.T) {
 }
 
 func TestNameParser_Parse_SingleFirstNameAndSingleLastName(t *testing.T) {
-	sut := seimei.NewNameParser()
+	sut := seimei.NewNameParser("/")
 	got, err := sut.Parse("乙一")
 	want := seimei.DividedName{
 		LastName: "乙",
 		FirstName: "一",
-		Separator: " ",
+		Separator: "/",
 		Score: 0,
 		Algorithm: seimei.Rule,
 	}

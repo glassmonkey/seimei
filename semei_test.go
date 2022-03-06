@@ -11,7 +11,7 @@ import (
 func TestRun(t *testing.T) {
 	want := "田中 太郎"
 	got := extractStdout(t, func() error {
-		return seimei.Run("田中太郎")
+		return seimei.Run("田中太郎", " ")
 	})
 	if got != want {
 		t.Errorf("failed to test. got: %s, want: %s", got, want)

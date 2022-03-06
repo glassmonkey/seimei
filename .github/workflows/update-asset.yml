@@ -25,6 +25,6 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git status
-          git add namedivider-python/assets/
+          git add namedivider-python/assets
           git commit -m "chore: update assets" -a
           git push

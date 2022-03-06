@@ -2,18 +2,6 @@ package seimei
 
 import "fmt"
 
-type NameParser struct {
-}
-func(NameParser) Parse(fullname string) (DividedName, error) {
-	return DividedName{}, nil
-}
-
-type DividedName struct {
-	FirstName string
-	LastName string
-}
-
-
 func initNameParser() (NameParser, error) {
 	return NameParser{}, nil
 }

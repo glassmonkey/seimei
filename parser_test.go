@@ -7,9 +7,15 @@ import (
 )
 
 func TestNameParser_Parse(t *testing.T) {
-	sut := seimei.NameParser{}
+	sut := seimei.NewNameParser()
 	got, err := sut.Parse("田中太郎")
-	want := seimei.DividedName{LastName: "田中", FirstName: "太郎"}
+	want := seimei.DividedName{
+		LastName: "田中",
+		FirstName: "太郎",
+		Separator: " ",
+		Score: 0,
+		Algorithm: "",
+	}
 	if err != nil {
 		t.Errorf("error is not nil, err=%v", err)
 	}

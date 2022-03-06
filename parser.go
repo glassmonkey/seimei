@@ -10,9 +10,10 @@ import (
 type Algorithm string
 
 const (
-	Rule          = Algorithm("rule")
-	Dummy         = Algorithm("dummy")
-	minNameLength = 2
+	Rule                   = Algorithm("rule")
+	Dummy                  = Algorithm("dummy")
+	minNameLength          = 2
+	separateConditionCount = 2
 )
 
 var ErrTextLength = errors.New("name length needs at least 2 chars")
@@ -78,11 +79,14 @@ func (n NameParser) parseByRule(fullname string) (DividedName, error) {
 			Algorithm: Rule,
 		}, nil
 	}
+
 	isKanjiList := make([]bool, length)
+
 	for i, c := range []rune(fullname) {
 		isKanji := n.Re.MatchString(string(c))
 		isKanjiList[i] = isKanji
-		if i >= 2 {
+
+		if i >= separateConditionCount {
 			if isKanjiList[0] != isKanji && isKanjiList[i-1] == isKanji {
 				return DividedName{
 					FirstName: string([]rune(fullname)[i-1:]),

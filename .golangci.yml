@@ -16,3 +16,4 @@ linters:
   disable:
     - forbidigo
     - ifshort
+    - varnamelen

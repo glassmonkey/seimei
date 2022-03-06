@@ -15,7 +15,11 @@ func TestRun(t *testing.T) {
 
 	want := "田中 太郎"
 	got := extractStdout(t, func() error {
-		return fmt.Errorf("run error: %w", seimei.Run("田中太郎", " "))
+		if err := seimei.Run("田中太郎", " "); err != nil {
+			return fmt.Errorf("happen error: %w", err)
+		}
+
+		return nil
 	})
 
 	if got != want {

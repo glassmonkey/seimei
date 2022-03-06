@@ -28,7 +28,5 @@ jobs:
       - name: Download Modules
         if: steps.cache.outputs.cache-hit != 'true'
         run: go mod download
-      - name: Run lint
-        run: make lint
       - name: Run tests
         run: make test

@@ -19,7 +19,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: update-csv
-        uses: cd namedivider-python && make download-csv
+        run: cd namedivider-python && make download-csv
       - name: Commit assets
         run: |
           git config --local user.email "action@github.com"

@@ -8,8 +8,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-//todo: Refactor parameterized test
-
+//nolint:godox
+// TODO: Refactor parameterized test.
 func TestNameParser_Parse(t *testing.T) {
 	t.Parallel()
 

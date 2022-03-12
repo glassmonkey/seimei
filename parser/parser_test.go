@@ -135,7 +135,7 @@ func TestFullName_Sprint(t *testing.T) {
 		inputPosition int
 		wantLastName  parser.LastName
 		wantFirstName parser.FirstName
-		wantErr       bool
+		wantErr       error
 	}
 
 	tests := []testdata{
@@ -145,7 +145,7 @@ func TestFullName_Sprint(t *testing.T) {
 			inputPosition: 0,
 			wantLastName:  "",
 			wantFirstName: "寿限無寿限無",
-			wantErr:       false,
+			wantErr:       nil,
 		},
 		{
 			name:          "4文字目",
@@ -153,7 +153,7 @@ func TestFullName_Sprint(t *testing.T) {
 			inputPosition: 4,
 			wantLastName:  "寿限無寿",
 			wantFirstName: "限無",
-			wantErr:       false,
+			wantErr:       nil,
 		},
 		{
 			name:          "6文字目",
@@ -161,7 +161,7 @@ func TestFullName_Sprint(t *testing.T) {
 			inputPosition: 6,
 			wantLastName:  "寿限無寿限無",
 			wantFirstName: "",
-			wantErr:       false,
+			wantErr:       nil,
 		},
 		{
 			name:          "7文字目は制限を超えるのでエラーになる",
@@ -169,7 +169,7 @@ func TestFullName_Sprint(t *testing.T) {
 			inputPosition: 7,
 			wantLastName:  "",
 			wantFirstName: "",
-			wantErr:       true,
+			wantErr:       parser.ErrSplitPosition,
 		},
 		{
 			name:          "-1文字目指定はエラーになる",
@@ -177,7 +177,7 @@ func TestFullName_Sprint(t *testing.T) {
 			inputPosition: -1,
 			wantLastName:  "",
 			wantFirstName: "",
-			wantErr:       true,
+			wantErr:       parser.ErrSplitPosition,
 		},
 	}
 
@@ -187,13 +187,9 @@ func TestFullName_Sprint(t *testing.T) {
 			t.Parallel()
 			sut := tt.input
 			l, f, err := sut.Split(tt.inputPosition)
-			if tt.wantErr && err == nil {
-				t.Fatalf("no error occurred, but error occurred is expected")
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
 			}
-			if !tt.wantErr && err != nil {
-				t.Fatalf("occurred error, %v", err)
-			}
-
 			if l != tt.wantLastName {
 				t.Errorf("LastName is not expected, got=(%s), want=(%s)", l, tt.wantLastName)
 			}

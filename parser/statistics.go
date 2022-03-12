@@ -7,10 +7,18 @@ const (
 )
 
 func NewStatisticsParser() StatisticsParser {
-	return StatisticsParser{}
+	return StatisticsParser{
+		Calculator: Calculator{},
+	}
 }
 
-type StatisticsParser struct{}
+type KanjiFeatureCalculator interface {
+	Score(lastName LastName, firstName FirstName) float64
+}
+
+type StatisticsParser struct {
+	Calculator KanjiFeatureCalculator
+}
 
 func (s StatisticsParser) Parse(fullname FullName, separator Separator) (DividedName, error) {
 	ms := 0.0
@@ -22,7 +30,7 @@ func (s StatisticsParser) Parse(fullname FullName, separator Separator) (Divided
 			return DividedName{}, fmt.Errorf("parse error: %w", err)
 		}
 
-		cs := s.score(l, f)
+		cs := s.Calculator.Score(l, f)
 
 		if cs > ms {
 			ms = cs
@@ -42,14 +50,4 @@ func (s StatisticsParser) Parse(fullname FullName, separator Separator) (Divided
 		Score:     ms,
 		Algorithm: Statistics,
 	}, nil
-}
-
-// stub implement.
-func (s StatisticsParser) score(lastName LastName, firstName FirstName) float64 {
-	v := float64(len(lastName) - len(firstName))
-	if v == 0 {
-		return 1
-	}
-
-	return 1 / (v * v)
 }

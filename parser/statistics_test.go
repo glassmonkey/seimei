@@ -64,7 +64,9 @@ func TestStatisticsParser_Parse(t *testing.T) {
 			if tt.skip {
 				t.Skip()
 			}
-			sut := parser.NewStatisticsParser()
+			sut := parser.StatisticsParser{
+				Calculator: DummyKanjiFeatureCalculator{},
+			}
 			got, err := sut.Parse(tt.input, separator)
 			if err != nil {
 				t.Errorf("error is not nil, err=%v", err)
@@ -75,4 +77,15 @@ func TestStatisticsParser_Parse(t *testing.T) {
 			}
 		})
 	}
+}
+
+type DummyKanjiFeatureCalculator struct{}
+
+func (s DummyKanjiFeatureCalculator) Score(lastName parser.LastName, firstName parser.FirstName) float64 {
+	v := float64(len(lastName) - len(firstName))
+	if v == 0 {
+		return 1
+	}
+
+	return 1 / (v * v)
 }

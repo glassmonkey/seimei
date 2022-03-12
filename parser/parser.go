@@ -20,7 +20,7 @@ type Parser interface {
 }
 type FullName string
 
-type FistName string
+type FirstName string
 
 type LastName string
 
@@ -36,7 +36,8 @@ func (f FullName) Split(position int) (LastName, FistName, error) {
 	if len < position {
 		return "", "", errors.New(fmt.Sprintf("position(=%d) is over text length(=%d)", position, len))
 	}
-	return LastName([]rune(f)[:position]), FistName([]rune(f)[position:]), nil
+
+	return LastName([]rune(f)[:position]), FirstName([]rune(f)[position:]), nil
 }
 
 func (f FullName) Slice() []rune {
@@ -87,14 +88,14 @@ func (n NameParser) Parse(fullname FullName) (DividedName, error) {
 
 func (n NameParser) validate(fullname FullName) error {
 	if fullname.Length() < minNameLength {
-		return ErrTextLength
+		return ErrNameLength
 	}
 
 	return nil
 }
 
 type DividedName struct {
-	FirstName FistName
+	FirstName FirstName
 	LastName  LastName
 	Separator Separator
 	Score     float64

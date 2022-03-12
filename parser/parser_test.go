@@ -83,7 +83,7 @@ func TestNameParser_Parse_Validate(t *testing.T) {
 
 	sut := parser.NewNameParser("/")
 	_, gotErr := sut.Parse("あ")
-	wantErr := parser.ErrTextLength
+	wantErr := parser.ErrNameLength
 
 	if !errors.Is(gotErr, wantErr) {
 		t.Errorf("error is not expected, got error=(%v), want error=(%v)", gotErr, wantErr)
@@ -98,6 +98,7 @@ func TestFullName_Length(t *testing.T) {
 		input parser.FullName
 		want  int
 	}
+
 	tests := []testdata{
 		{
 			name:  "漢字",
@@ -110,6 +111,7 @@ func TestFullName_Length(t *testing.T) {
 			want:  4,
 		},
 	}
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
@@ -132,9 +134,10 @@ func TestFullName_Sprint(t *testing.T) {
 		input         parser.FullName
 		inputPosition int
 		wantLastName  parser.LastName
-		wantFirstName parser.FistName
+		wantFirstName parser.FirstName
 		wantErr       bool
 	}
+
 	tests := []testdata{
 		{
 			name:          "0文字目",
@@ -177,6 +180,7 @@ func TestFullName_Sprint(t *testing.T) {
 			wantErr:       true,
 		},
 	}
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {

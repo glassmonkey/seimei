@@ -13,7 +13,10 @@ const (
 	minNameLength = 2
 )
 
-var ErrTextLength = errors.New("name length needs at least 2 chars")
+var (
+	ErrNameLength    = errors.New("name length needs at least 2 chars")
+	ErrSplitPosition = errors.New("split position is invalid")
+)
 
 type Parser interface {
 	Parse(fullname FullName, separator Separator) (DividedName, error)
@@ -28,13 +31,15 @@ func (f FullName) Length() int {
 	return utf8.RuneCountInString(string(f))
 }
 
-func (f FullName) Split(position int) (LastName, FistName, error) {
-	len := f.Length()
+func (f FullName) Split(position int) (LastName, FirstName, error) {
+	length := f.Length()
+
 	if position < 0 {
-		return "", "", errors.New(fmt.Sprintf("position(=%d) must be positive", position))
+		return "", "", fmt.Errorf("%w: position(=%d) must be positive", ErrSplitPosition, position)
 	}
-	if len < position {
-		return "", "", errors.New(fmt.Sprintf("position(=%d) is over text length(=%d)", position, len))
+
+	if length < position {
+		return "", "", fmt.Errorf("%w: position(=%d) is over text length(=%d)", ErrSplitPosition, position, length)
 	}
 
 	return LastName([]rune(f)[:position]), FirstName([]rune(f)[position:]), nil

@@ -53,6 +53,7 @@ func (p RuleBaseParser) Parse(fullname FullName, separator Separator) (DividedNa
 				if err != nil {
 					return DividedName{}, fmt.Errorf("rule parser error: %w", err)
 				}
+
 				return DividedName{
 					FirstName: f,
 					LastName:  l,

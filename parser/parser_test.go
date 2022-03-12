@@ -203,6 +203,9 @@ func TestFullName_Sprint(t *testing.T) {
 			if got != tt.input {
 				t.Errorf("fullname is not expected, got=(%s), want=(%s)", got, tt.input)
 			}
+			if f.Length()+l.Length() != tt.input.Length() {
+				t.Errorf("fullname's length is not expected, got(fist_name=(%s), last_name=(%s)), want(%s)", f, l, tt.input)
+			}
 		})
 	}
 }

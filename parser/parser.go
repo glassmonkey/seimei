@@ -25,7 +25,15 @@ type FullName string
 
 type FirstName string
 
+func (n FirstName) Length() int {
+	return utf8.RuneCountInString(string(n))
+}
+
 type LastName string
+
+func (n LastName) Length() int {
+	return utf8.RuneCountInString(string(n))
+}
 
 func JoinName(lastName LastName, firstName FirstName) FullName {
 	return FullName(string(lastName) + string(firstName))

@@ -10,20 +10,75 @@ import (
 	"github.com/glassmonkey/seimei"
 )
 
+//nolint:tparallel
 func TestRun(t *testing.T) {
 	t.Parallel()
 
-	want := "田中 太郎"
-	got := extractStdout(t, func() error {
-		if err := seimei.Run("田中太郎", " "); err != nil {
-			return fmt.Errorf("happen error: %w", err)
-		}
+	type testdata struct {
+		name        string
+		inputName   string
+		inputParser string
+		want        string
+		skip        bool
+	}
 
-		return nil
-	})
+	tests := []testdata{
+		{
+			name:        "サンプル",
+			inputName:   "田中太郎",
+			inputParser: " ",
+			want:        "田中 太郎",
+			skip:        false,
+		},
+		{
+			name:        "分割文字列が反映される",
+			inputName:   "田中太郎",
+			inputParser: "/",
+			want:        "田中/太郎",
+			skip:        false,
+		},
+		{
+			name:        "ルールベースで動作する",
+			inputName:   "乙一",
+			inputParser: " ",
+			want:        "乙 一",
+			skip:        false,
+		},
+		{
+			name:        "統計量ベースで動作する(仮実装)",
+			inputName:   "竈門炭治郎",
+			inputParser: " ",
+			want:        "竈門 炭治郎",
+			skip:        false,
+		},
+		{
+			name:        "統計量ベースで動作しない(仮実装)",
+			inputName:   "中曽根康弘",
+			inputParser: " ",
 
-	if got != want {
-		t.Errorf("failed to test. got: %s, want: %s", got, want)
+			skip: true,
+		},
+	}
+	//nolint:paralleltest
+	for _, tt := range tests {
+		tt := tt
+
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.skip {
+				t.Skip()
+			}
+			got := extractStdout(t, func() error {
+				if err := seimei.Run(tt.inputName, tt.inputParser); err != nil {
+					return fmt.Errorf("happen error: %w", err)
+				}
+
+				return nil
+			})
+
+			if got != tt.want {
+				t.Errorf("failed to test. got: %s, want: %s", got, tt.want)
+			}
+		})
 	}
 }
 

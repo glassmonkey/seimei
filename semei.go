@@ -19,7 +19,7 @@ func Run(fullname string, parseString string) error {
 
 	name, err := p.Parse(parser.FullName(fullname))
 	if err != nil {
-		return err
+		return fmt.Errorf("happen error: %w", err)
 	}
 
 	fmt.Printf("%s\n", name.String())

@@ -1,10 +1,14 @@
 package seimei
 
 import (
+	_ "embed"
 	"fmt"
 
 	"github.com/glassmonkey/seimei/parser"
 )
+
+//go:embed namedivider-python/assets/kanji.csv
+var Assets string
 
 //nolint:unparam
 func initNameParser(parseString string) (parser.NameParser, error) {

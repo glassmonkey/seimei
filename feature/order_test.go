@@ -130,7 +130,7 @@ func TestKanjiFeatureOrderCalculator_SelectFeaturePosition(t *testing.T) {
 		name          string
 		inputName     feature.PartOfNameCharacters
 		inputPosition int
-		wantPosition  feature.IndexPosition
+		wantPosition  feature.OrderFeatureIndexPosition
 		wantErr       error
 	}
 
@@ -139,56 +139,56 @@ func TestKanjiFeatureOrderCalculator_SelectFeaturePosition(t *testing.T) {
 			name:          "名前1文字目",
 			inputName:     parser.FirstName("あきら"),
 			inputPosition: 0,
-			wantPosition:  feature.FirstFeatureIndex.MoveFirstNameIndex(),
+			wantPosition:  feature.OrderFirstFeatureIndex.MoveFirstNameIndex(),
 			wantErr:       nil,
 		},
 		{
 			name:          "名前2文字目",
 			inputName:     parser.FirstName("あきら"),
 			inputPosition: 1,
-			wantPosition:  feature.MiddleFeatureIndex.MoveFirstNameIndex(),
+			wantPosition:  feature.OrderMiddleFeatureIndex.MoveFirstNameIndex(),
 			wantErr:       nil,
 		},
 		{
 			name:          "名前3文字目",
 			inputName:     parser.FirstName("あきら"),
 			inputPosition: 2,
-			wantPosition:  feature.EndFeatureIndex.MoveFirstNameIndex(),
+			wantPosition:  feature.OrderEndFeatureIndex.MoveFirstNameIndex(),
 			wantErr:       nil,
 		},
 		{
 			name:          "名字1文字目",
 			inputName:     parser.LastName("中山田"),
 			inputPosition: 0,
-			wantPosition:  feature.FirstFeatureIndex,
+			wantPosition:  feature.OrderFirstFeatureIndex,
 			wantErr:       nil,
 		},
 		{
 			name:          "名字2文字目",
 			inputName:     parser.LastName("中山田"),
 			inputPosition: 1,
-			wantPosition:  feature.MiddleFeatureIndex,
+			wantPosition:  feature.OrderMiddleFeatureIndex,
 			wantErr:       nil,
 		},
 		{
 			name:          "名前3文字目",
 			inputName:     parser.LastName("中山田"),
 			inputPosition: 2,
-			wantPosition:  feature.EndFeatureIndex,
+			wantPosition:  feature.OrderEndFeatureIndex,
 			wantErr:       nil,
 		},
 		{
 			name:          "負の数を指定",
 			inputName:     parser.LastName("中山田"),
 			inputPosition: -1,
-			wantPosition:  feature.EndFeatureIndex,
+			wantPosition:  feature.OrderEndFeatureIndex,
 			wantErr:       feature.ErrOutRangeFeatureIndex,
 		},
 		{
 			name:          "最大を超える",
 			inputName:     parser.LastName("中山田"),
 			inputPosition: 3,
-			wantPosition:  feature.EndFeatureIndex,
+			wantPosition:  feature.OrderEndFeatureIndex,
 			wantErr:       feature.ErrOutRangeFeatureIndex,
 		},
 	}

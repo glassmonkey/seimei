@@ -10,17 +10,17 @@ var (
 	ErrOutRangeFeatureIndex = errors.New("character position is out of range when selecting features")
 )
 
-type IndexPosition int
+type OrderFeatureIndexPosition int
 
-func (i IndexPosition) MoveFirstNameIndex() IndexPosition {
-	return i + featureSize/2
+func (i OrderFeatureIndexPosition) MoveFirstNameIndex() OrderFeatureIndexPosition {
+	return i + OrderFeatureSize/2
 }
 
 const (
-	featureSize        = 6
-	FirstFeatureIndex  = IndexPosition(0)
-	MiddleFeatureIndex = IndexPosition(1)
-	EndFeatureIndex    = IndexPosition(2)
+	OrderFeatureSize        = 6
+	OrderFirstFeatureIndex  = OrderFeatureIndexPosition(0)
+	OrderMiddleFeatureIndex = OrderFeatureIndexPosition(1)
+	OrderEndFeatureIndex    = OrderFeatureIndexPosition(2)
 )
 
 type KanjiFeatureOrderCalculator struct{}
@@ -49,32 +49,32 @@ func (fc KanjiFeatureOrderCalculator) Mask(fullNameLength, charPosition int) ([]
 	return []float64{0, 1, 1, 1, 1, 0}, nil
 }
 
-func (fc KanjiFeatureOrderCalculator) SelectFeaturePosition(pieceOfName PartOfNameCharacters, positionInPieceOfName int) (IndexPosition, error) {
+func (fc KanjiFeatureOrderCalculator) SelectFeaturePosition(pieceOfName PartOfNameCharacters, positionInPieceOfName int) (OrderFeatureIndexPosition, error) {
 	if positionInPieceOfName < 0 || positionInPieceOfName >= pieceOfName.Length() {
 		return 0, ErrOutRangeFeatureIndex
 	}
 
 	if positionInPieceOfName == 0 {
 		if pieceOfName.IsLastName() {
-			return FirstFeatureIndex, nil
+			return OrderFirstFeatureIndex, nil
 		}
 
-		return FirstFeatureIndex.MoveFirstNameIndex(), nil
+		return OrderFirstFeatureIndex.MoveFirstNameIndex(), nil
 	}
 
 	if positionInPieceOfName != pieceOfName.Length()-1 {
 		if pieceOfName.IsLastName() {
-			return MiddleFeatureIndex, nil
+			return OrderMiddleFeatureIndex, nil
 		}
 
-		return MiddleFeatureIndex.MoveFirstNameIndex(), nil
+		return OrderMiddleFeatureIndex.MoveFirstNameIndex(), nil
 	}
 
 	if pieceOfName.IsLastName() {
-		return EndFeatureIndex, nil
+		return OrderEndFeatureIndex, nil
 	}
 
-	return EndFeatureIndex.MoveFirstNameIndex(), nil
+	return OrderEndFeatureIndex.MoveFirstNameIndex(), nil
 }
 
 // Score patch work implementation.

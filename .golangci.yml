@@ -17,3 +17,4 @@ linters:
     - forbidigo
     - ifshort
     - varnamelen
+    - funlen

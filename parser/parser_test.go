@@ -66,28 +66,6 @@ func TestNameParser_Parse_SingleFirstNameAndSingleLastName(t *testing.T) {
 	}
 }
 
-func TestNameParser_Parse_NameHasNotKanji(t *testing.T) {
-	t.Parallel()
-
-	sut := parser.NewNameParser("/")
-	got, err := sut.Parse("関ヶ原タロウ")
-	want := parser.DividedName{
-		LastName:  "関ヶ原",
-		FirstName: "タロウ",
-		Separator: "/",
-		Score:     1,
-		Algorithm: parser.Rule,
-	}
-
-	if err != nil {
-		t.Errorf("error is not nil, err=%v", err)
-	}
-
-	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("divided name mismatch (-got +want):\n%s", diff)
-	}
-}
-
 func TestNameParser_Parse_NameHasNotKanjiName(t *testing.T) {
 	t.Parallel()
 

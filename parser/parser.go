@@ -20,6 +20,29 @@ type Parser interface {
 }
 type FullName string
 
+type FistName string
+
+type LastName string
+
+func (f FullName) Length() int {
+	return utf8.RuneCountInString(string(f))
+}
+
+func (f FullName) Split(position int) (LastName, FistName, error) {
+	len := f.Length()
+	if position < 0 {
+		return "", "", errors.New(fmt.Sprintf("position(=%d) must be positive", position))
+	}
+	if len < position {
+		return "", "", errors.New(fmt.Sprintf("position(=%d) is over text length(=%d)", position, len))
+	}
+	return LastName([]rune(f)[:position]), FistName([]rune(f)[position:]), nil
+}
+
+func (f FullName) Slice() []rune {
+	return []rune(f)
+}
+
 type Separator string
 
 type NameParser struct {
@@ -63,9 +86,7 @@ func (n NameParser) Parse(fullname FullName) (DividedName, error) {
 }
 
 func (n NameParser) validate(fullname FullName) error {
-	v := utf8.RuneCountInString(string(fullname))
-
-	if v < minNameLength {
+	if fullname.Length() < minNameLength {
 		return ErrTextLength
 	}
 
@@ -73,15 +94,15 @@ func (n NameParser) validate(fullname FullName) error {
 }
 
 type DividedName struct {
-	FirstName string
-	LastName  string
+	FirstName FistName
+	LastName  LastName
 	Separator Separator
 	Score     float64
 	Algorithm Algorithm
 }
 
 func (n DividedName) String() string {
-	return n.LastName + string(n.Separator) + n.FirstName
+	return string(n.LastName) + string(n.Separator) + string(n.FirstName)
 }
 
 //nolint:exhaustivestruct

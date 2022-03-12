@@ -89,3 +89,113 @@ func TestNameParser_Parse_Validate(t *testing.T) {
 		t.Errorf("error is not expected, got error=(%v), want error=(%v)", gotErr, wantErr)
 	}
 }
+
+func TestFullName_Length(t *testing.T) {
+	t.Parallel()
+
+	type testdata struct {
+		name  string
+		input parser.FullName
+		want  int
+	}
+	tests := []testdata{
+		{
+			name:  "漢字",
+			input: "中山",
+			want:  2,
+		},
+		{
+			name:  "アルファベット混合",
+			input: "DJ田中",
+			want:  4,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			sut := tt.input
+			got := sut.Length()
+
+			if got != tt.want {
+				t.Errorf("length is not expected, got=(%d), want=(%d)", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFullName_Sprint(t *testing.T) {
+	t.Parallel()
+
+	type testdata struct {
+		name          string
+		input         parser.FullName
+		inputPosition int
+		wantLastName  parser.LastName
+		wantFirstName parser.FistName
+		wantErr       bool
+	}
+	tests := []testdata{
+		{
+			name:          "0文字目",
+			input:         "寿限無寿限無",
+			inputPosition: 0,
+			wantLastName:  "",
+			wantFirstName: "寿限無寿限無",
+			wantErr:       false,
+		},
+		{
+			name:          "4文字目",
+			input:         "寿限無寿限無",
+			inputPosition: 4,
+			wantLastName:  "寿限無寿",
+			wantFirstName: "限無",
+			wantErr:       false,
+		},
+		{
+			name:          "6文字目",
+			input:         "寿限無寿限無",
+			inputPosition: 6,
+			wantLastName:  "寿限無寿限無",
+			wantFirstName: "",
+			wantErr:       false,
+		},
+		{
+			name:          "7文字目は制限を超えるのでエラーになる",
+			input:         "寿限無寿限無",
+			inputPosition: 7,
+			wantLastName:  "",
+			wantFirstName: "",
+			wantErr:       true,
+		},
+		{
+			name:          "-1文字目指定はエラーになる",
+			input:         "寿限無寿限無",
+			inputPosition: -1,
+			wantLastName:  "",
+			wantFirstName: "",
+			wantErr:       true,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			sut := tt.input
+			l, f, err := sut.Split(tt.inputPosition)
+			if tt.wantErr && err == nil {
+				t.Fatalf("no error occurred, but error occurred is expected")
+			}
+			if !tt.wantErr && err != nil {
+				t.Fatalf("occurred error, %v", err)
+			}
+
+			if l != tt.wantLastName {
+				t.Errorf("LastName is not expected, got=(%s), want=(%s)", l, tt.wantLastName)
+			}
+			if f != tt.wantFirstName {
+				t.Errorf("LastName is not expected, got=(%s), want=(%s)", f, tt.wantFirstName)
+			}
+		})
+	}
+}

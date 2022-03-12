@@ -10,6 +10,7 @@ import (
 	"github.com/glassmonkey/seimei"
 )
 
+//nolint:tparallel
 func TestRun(t *testing.T) {
 	t.Parallel()
 
@@ -30,7 +31,7 @@ func TestRun(t *testing.T) {
 			skip:        false,
 		},
 		{
-			name:        "パーサーが反映される",
+			name:        "分割文字列が反映される",
 			inputName:   "田中太郎",
 			inputParser: "/",
 			want:        "田中/太郎",
@@ -58,7 +59,7 @@ func TestRun(t *testing.T) {
 			skip: true,
 		},
 	}
-
+	//nolint:paralleltest
 	for _, tt := range tests {
 		tt := tt
 

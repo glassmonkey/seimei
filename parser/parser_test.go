@@ -190,11 +190,18 @@ func TestFullName_Sprint(t *testing.T) {
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
 			}
+			if tt.wantErr != nil {
+				return
+			}
 			if l != tt.wantLastName {
 				t.Errorf("LastName is not expected, got=(%s), want=(%s)", l, tt.wantLastName)
 			}
 			if f != tt.wantFirstName {
 				t.Errorf("LastName is not expected, got=(%s), want=(%s)", f, tt.wantFirstName)
+			}
+			got := parser.JoinName(l, f)
+			if got != tt.input {
+				t.Errorf("fullname is not expected, got=(%s), want=(%s)", got, tt.input)
 			}
 		})
 	}

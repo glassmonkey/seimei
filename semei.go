@@ -4,7 +4,7 @@ import "fmt"
 
 //nolint:unparam
 func initNameParser(parseString string) (NameParser, error) {
-	return NewNameParser(parseString), nil
+	return NewNameParser(Separator(parseString)), nil
 }
 
 func Run(fullname string, parseString string) error {
@@ -13,7 +13,7 @@ func Run(fullname string, parseString string) error {
 		return err
 	}
 
-	name, err := p.Parse(fullname)
+	name, err := p.Parse(FullName(fullname))
 	if err != nil {
 		return err
 	}

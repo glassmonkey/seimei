@@ -13,6 +13,7 @@ func main() {
 	parse := flag.String("parse", " ", "separate characters")
 
 	flag.Parse()
+
 	if err := seimei.Run(*name, *parse); err != nil {
 		fmt.Printf("raised error: %s\n", err)
 		os.Exit(1)

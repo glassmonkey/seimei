@@ -3,7 +3,6 @@ package seimei
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"unicode/utf8"
 )
 
@@ -18,34 +17,44 @@ const (
 
 var ErrTextLength = errors.New("name length needs at least 2 chars")
 
+type Parser interface {
+	Parse(fullname FullName, separator Separator) (DividedName, error)
+}
+type FullName string
+
+type Separator string
+
 type NameParser struct {
-	Separator string
-	Re        *regexp.Regexp
+	Parsers   []Parser
+	Separator Separator
 }
 
-func NewNameParser(parserString string) NameParser {
-	re := regexp.MustCompile(`\p{Han}+`)
+func NewNameParser(separatorString Separator) NameParser {
+	s := make([]Parser, 0)
+	s = append(s, NewRuleBaseParser())
 
 	return NameParser{
-		Separator: parserString,
-		Re:        re,
+		Parsers:   s,
+		Separator: separatorString,
 	}
 }
 
-func (n NameParser) Parse(fullname string) (DividedName, error) {
+func (n NameParser) Parse(fullname FullName) (DividedName, error) {
 	if err := n.validate(fullname); err != nil {
 		return DividedName{}, fmt.Errorf("parse error: %w", err)
 	}
 
-	vByRule, err := n.parseByRule(fullname)
-	if err != nil {
-		return DividedName{}, fmt.Errorf("parse error: %w", err)
+	for _, p := range n.Parsers {
+		v, err := p.Parse(fullname, n.Separator)
+		if err != nil {
+			return DividedName{}, fmt.Errorf("parse error: %w", err)
+		}
+
+		if !v.IsZero() {
+			return v, nil
+		}
 	}
 
-	if !vByRule.IsZero() {
-		return vByRule, nil
-	}
-	// Dummy Data. Todo: make from parser.
 	return DividedName{
 		FirstName: "太郎",
 		LastName:  "田中",
@@ -55,8 +64,8 @@ func (n NameParser) Parse(fullname string) (DividedName, error) {
 	}, nil
 }
 
-func (n NameParser) validate(fullname string) error {
-	v := utf8.RuneCountInString(fullname)
+func (n NameParser) validate(fullname FullName) error {
+	v := utf8.RuneCountInString(string(fullname))
 
 	if v < minNameLength {
 		return ErrTextLength
@@ -65,53 +74,16 @@ func (n NameParser) validate(fullname string) error {
 	return nil
 }
 
-//nolint:unparam
-//referer: https://github.com/rskmoi/namedivider-python/blob/master/namedivider/name_divider.py#L238
-func (n NameParser) parseByRule(fullname string) (DividedName, error) {
-	length := utf8.RuneCountInString(fullname)
-
-	if length == minNameLength {
-		return DividedName{
-			FirstName: string([]rune(fullname)[1:2]),
-			LastName:  string([]rune(fullname)[0:1]),
-			Separator: n.Separator,
-			Score:     1,
-			Algorithm: Rule,
-		}, nil
-	}
-
-	isKanjiList := make([]bool, length)
-
-	for i, c := range []rune(fullname) {
-		isKanji := n.Re.MatchString(string(c))
-		isKanjiList[i] = isKanji
-
-		if i >= separateConditionCount {
-			if isKanjiList[0] != isKanji && isKanjiList[i-1] == isKanji {
-				return DividedName{
-					FirstName: string([]rune(fullname)[i-1:]),
-					LastName:  string([]rune(fullname)[:i-1]),
-					Separator: n.Separator,
-					Score:     1,
-					Algorithm: Rule,
-				}, nil
-			}
-		}
-	}
-	//nolint:exhaustivestruct
-	return DividedName{}, nil
-}
-
 type DividedName struct {
 	FirstName string
 	LastName  string
-	Separator string
+	Separator Separator
 	Score     float64
 	Algorithm Algorithm
 }
 
 func (n DividedName) String() string {
-	return n.LastName + n.Separator + n.FirstName
+	return n.LastName + string(n.Separator) + n.FirstName
 }
 
 //nolint:exhaustivestruct

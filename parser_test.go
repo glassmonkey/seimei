@@ -53,7 +53,7 @@ func TestNameParser_Parse_SingleFirstNameAndSingleLastName(t *testing.T) {
 		LastName:  "乙",
 		FirstName: "一",
 		Separator: "/",
-		Score:     0,
+		Score:     1,
 		Algorithm: seimei.Rule,
 	}
 
@@ -75,7 +75,7 @@ func TestNameParser_Parse_NameHasNotKanji(t *testing.T) {
 		LastName:  "関ヶ原",
 		FirstName: "タロウ",
 		Separator: "/",
-		Score:     0,
+		Score:     1,
 		Algorithm: seimei.Rule,
 	}
 
@@ -97,7 +97,7 @@ func TestNameParser_Parse_NameHasNotKanjiName(t *testing.T) {
 		LastName:  "中山",
 		FirstName: "マサ",
 		Separator: "/",
-		Score:     0,
+		Score:     1,
 		Algorithm: seimei.Rule,
 	}
 

@@ -25,6 +25,10 @@ type FullName string
 
 type FirstName string
 
+func (n FirstName) IsLastName() bool {
+	return false
+}
+
 func (n FirstName) Length() int {
 	return utf8.RuneCountInString(string(n))
 }
@@ -34,6 +38,10 @@ func (n FirstName) Slice() []rune {
 }
 
 type LastName string
+
+func (n LastName) IsLastName() bool {
+	return true
+}
 
 func (n LastName) Slice() []rune {
 	return []rune(n)

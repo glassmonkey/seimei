@@ -1,6 +1,7 @@
 package feature
 
-type MultiCharacters interface {
+type PartOfNameCharacters interface {
 	Length() int
 	Slice() []rune
+	IsLastName() bool
 }

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/seimei/feature"
+	"github.com/glassmonkey/seimei/parser"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -25,14 +26,14 @@ func TestKanjiFeatureOrderCalculator_Mask(t *testing.T) {
 			inputLength:   5,
 			inputPosition: -1,
 			wantMask:      []float64{},
-			wantErr:       feature.ErrOutRangeOrderMaskError,
+			wantErr:       feature.ErrOutRangeOrderMask,
 		},
 		{
 			name:          "(1/5)文字目指定",
 			inputLength:   5,
 			inputPosition: 0,
 			wantMask:      []float64{},
-			wantErr:       feature.ErrInvalidOrderMaskError,
+			wantErr:       feature.ErrInvalidOrderMask,
 		},
 		{
 			name:          "(2/5)文字目指定",
@@ -66,7 +67,7 @@ func TestKanjiFeatureOrderCalculator_Mask(t *testing.T) {
 			inputLength:   5,
 			inputPosition: 4,
 			wantMask:      []float64{},
-			wantErr:       feature.ErrInvalidOrderMaskError,
+			wantErr:       feature.ErrInvalidOrderMask,
 		},
 		{
 			name:          "5文字目指定",
@@ -75,14 +76,14 @@ func TestKanjiFeatureOrderCalculator_Mask(t *testing.T) {
 			wantMask: []float64{
 				0, 0, 1, 1, 1, 0,
 			},
-			wantErr: feature.ErrOutRangeOrderMaskError,
+			wantErr: feature.ErrOutRangeOrderMask,
 		},
 		{
 			name:          "(1/3)文字目指定",
 			inputLength:   3,
 			inputPosition: 0,
 			wantMask:      []float64{},
-			wantErr:       feature.ErrInvalidOrderMaskError,
+			wantErr:       feature.ErrInvalidOrderMask,
 		},
 		{
 			name:          "(2/3)文字目指定",
@@ -98,7 +99,7 @@ func TestKanjiFeatureOrderCalculator_Mask(t *testing.T) {
 			inputLength:   3,
 			inputPosition: 2,
 			wantMask:      []float64{},
-			wantErr:       feature.ErrInvalidOrderMaskError,
+			wantErr:       feature.ErrInvalidOrderMask,
 		},
 	}
 
@@ -108,7 +109,6 @@ func TestKanjiFeatureOrderCalculator_Mask(t *testing.T) {
 			t.Parallel()
 			sut := feature.KanjiFeatureOrderCalculator{}
 			got, err := sut.Mask(tt.inputLength, tt.inputPosition)
-
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
 			}
@@ -117,6 +117,96 @@ func TestKanjiFeatureOrderCalculator_Mask(t *testing.T) {
 			}
 
 			if diff := cmp.Diff(got, tt.wantMask); diff != "" {
+				t.Errorf("mask value mismatch (-got +want):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestKanjiFeatureOrderCalculator_SelectFeaturePosition(t *testing.T) {
+	t.Parallel()
+
+	type testdata struct {
+		name          string
+		inputName     feature.PartOfNameCharacters
+		inputPosition int
+		wantPosition  feature.IndexPosition
+		wantErr       error
+	}
+
+	tests := []testdata{
+		{
+			name:          "名前1文字目",
+			inputName:     parser.FirstName("あきら"),
+			inputPosition: 0,
+			wantPosition:  feature.FirstFeatureIndex.MoveFirstNameIndex(),
+			wantErr:       nil,
+		},
+		{
+			name:          "名前2文字目",
+			inputName:     parser.FirstName("あきら"),
+			inputPosition: 1,
+			wantPosition:  feature.MiddleFeatureIndex.MoveFirstNameIndex(),
+			wantErr:       nil,
+		},
+		{
+			name:          "名前3文字目",
+			inputName:     parser.FirstName("あきら"),
+			inputPosition: 2,
+			wantPosition:  feature.EndFeatureIndex.MoveFirstNameIndex(),
+			wantErr:       nil,
+		},
+		{
+			name:          "名字1文字目",
+			inputName:     parser.LastName("中山田"),
+			inputPosition: 0,
+			wantPosition:  feature.FirstFeatureIndex,
+			wantErr:       nil,
+		},
+		{
+			name:          "名字2文字目",
+			inputName:     parser.LastName("中山田"),
+			inputPosition: 1,
+			wantPosition:  feature.MiddleFeatureIndex,
+			wantErr:       nil,
+		},
+		{
+			name:          "名前3文字目",
+			inputName:     parser.LastName("中山田"),
+			inputPosition: 2,
+			wantPosition:  feature.EndFeatureIndex,
+			wantErr:       nil,
+		},
+		{
+			name:          "負の数を指定",
+			inputName:     parser.LastName("中山田"),
+			inputPosition: -1,
+			wantPosition:  feature.EndFeatureIndex,
+			wantErr:       feature.ErrOutRangeFeatureIndex,
+		},
+		{
+			name:          "最大を超える",
+			inputName:     parser.LastName("中山田"),
+			inputPosition: 3,
+			wantPosition:  feature.EndFeatureIndex,
+			wantErr:       feature.ErrOutRangeFeatureIndex,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			sut := feature.KanjiFeatureOrderCalculator{}
+			got, err := sut.SelectFeaturePosition(tt.inputName, tt.inputPosition)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
+			}
+			if tt.wantErr != nil {
+				return
+			}
+
+			if diff := cmp.Diff(got, tt.wantPosition); diff != "" {
 				t.Errorf("mask value mismatch (-got +want):\n%s", diff)
 			}
 		})

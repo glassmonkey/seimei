@@ -5,20 +5,35 @@ import (
 )
 
 var (
-	ErrOutRangeOrderMaskError = errors.New("character position is out of range")
-	ErrInvalidOrderMaskError  = errors.New("first character and last character must not be created order mask")
+	ErrOutRangeOrderMask    = errors.New("character position is out of range when creating mask")
+	ErrInvalidOrderMask     = errors.New("first character and last character must not be created order mask")
+	ErrOutRangeFeatureIndex = errors.New("character position is out of range when selecting features")
+)
+
+type IndexPosition int
+
+func (i IndexPosition) MoveFirstNameIndex() IndexPosition {
+	return i + featureSize/2
+}
+
+const (
+	featureSize        = 6
+	FirstFeatureIndex  = IndexPosition(0)
+	MiddleFeatureIndex = IndexPosition(1)
+	EndFeatureIndex    = IndexPosition(2)
 )
 
 type KanjiFeatureOrderCalculator struct{}
 
 func (fc KanjiFeatureOrderCalculator) Mask(fullNameLength, charPosition int) ([]float64, error) {
 	if charPosition == 0 || charPosition == fullNameLength-1 {
-		return []float64{}, ErrInvalidOrderMaskError
-	}
-	if charPosition < 0 || charPosition >= fullNameLength {
-		return []float64{}, ErrOutRangeOrderMaskError
+		return []float64{}, ErrInvalidOrderMask
 	}
 
+	if charPosition < 0 || charPosition >= fullNameLength {
+		return []float64{}, ErrOutRangeOrderMask
+	}
+	//nolint:gomnd
 	if fullNameLength == 3 {
 		return []float64{0, 0, 1, 1, 0, 0}, nil
 	}
@@ -26,33 +41,44 @@ func (fc KanjiFeatureOrderCalculator) Mask(fullNameLength, charPosition int) ([]
 	if charPosition == 1 {
 		return []float64{0, 1, 1, 1, 0, 0}, nil
 	}
+
 	if charPosition == fullNameLength-2 {
 		return []float64{0, 0, 1, 1, 1, 0}, nil
 	}
+
 	return []float64{0, 1, 1, 1, 1, 0}, nil
 }
 
-func (fc KanjiFeatureOrderCalculator) Status(pieceOfName MultiCharacters, positionInPieceOfName int, isLastName bool) int {
+func (fc KanjiFeatureOrderCalculator) SelectFeaturePosition(pieceOfName PartOfNameCharacters, positionInPieceOfName int) (IndexPosition, error) {
+	if positionInPieceOfName < 0 || positionInPieceOfName >= pieceOfName.Length() {
+		return 0, ErrOutRangeFeatureIndex
+	}
+
 	if positionInPieceOfName == 0 {
-		if isLastName {
-			return 0
+		if pieceOfName.IsLastName() {
+			return FirstFeatureIndex, nil
 		}
-		return 3
+
+		return FirstFeatureIndex.MoveFirstNameIndex(), nil
 	}
-	if positionInPieceOfName == pieceOfName.Length()-1 {
-		if isLastName {
-			return 2
+
+	if positionInPieceOfName != pieceOfName.Length()-1 {
+		if pieceOfName.IsLastName() {
+			return MiddleFeatureIndex, nil
 		}
-		return 5
+
+		return MiddleFeatureIndex.MoveFirstNameIndex(), nil
 	}
-	if isLastName {
-		return 1
+
+	if pieceOfName.IsLastName() {
+		return EndFeatureIndex, nil
 	}
-	return 4
+
+	return EndFeatureIndex.MoveFirstNameIndex(), nil
 }
 
 // Score patch work implementation.
-func (fc KanjiFeatureOrderCalculator) Score(pieceOfName MultiCharacters, fullNameLength, startPosition int) (float64, error) {
+func (fc KanjiFeatureOrderCalculator) Score(pieceOfName PartOfNameCharacters, fullNameLength, startPosition int) (float64, error) {
 	// isLastName := startPosition == 0
 	score := 0.0
 	/*

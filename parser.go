@@ -75,7 +75,7 @@ func (n NameParser) parseByRule(fullname string) (DividedName, error) {
 			FirstName: string([]rune(fullname)[1:2]),
 			LastName:  string([]rune(fullname)[0:1]),
 			Separator: n.Separator,
-			Score:     0,
+			Score:     1,
 			Algorithm: Rule,
 		}, nil
 	}
@@ -92,7 +92,7 @@ func (n NameParser) parseByRule(fullname string) (DividedName, error) {
 					FirstName: string([]rune(fullname)[i-1:]),
 					LastName:  string([]rune(fullname)[:i-1]),
 					Separator: n.Separator,
-					Score:     0,
+					Score:     1,
 					Algorithm: Rule,
 				}, nil
 			}

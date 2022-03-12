@@ -17,7 +17,6 @@ func (s StatisticsParser) Parse(fullname FullName, separator Separator) (Divided
 	mi := 0
 
 	for i := range fullname.Slice() {
-		i := i
 		l, f, err := fullname.Split(i)
 		if err != nil {
 			return DividedName{}, fmt.Errorf("parse error: %w", err)
@@ -51,5 +50,6 @@ func (s StatisticsParser) score(lastName LastName, firstName FirstName) float64 
 	if v == 0 {
 		return 1
 	}
+
 	return 1 / (v * v)
 }

@@ -59,6 +59,7 @@ type NameParser struct {
 func NewNameParser(separatorString Separator) NameParser {
 	s := make([]Parser, 0)
 	s = append(s, NewRuleBaseParser())
+	s = append(s, NewStatisticsParser())
 
 	return NameParser{
 		Parsers:   s,

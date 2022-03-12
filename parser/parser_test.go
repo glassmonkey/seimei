@@ -54,8 +54,7 @@ func TestNameParser_Parse(t *testing.T) {
 				Score:     0,
 				Algorithm: parser.Dummy,
 			},
-			//nolint:godoc
-			skip: true, //todo: implemented
+			skip: true,
 		},
 	}
 

@@ -1,10 +1,14 @@
 package seimei
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/glassmonkey/seimei/parser"
+)
 
 //nolint:unparam
-func initNameParser(parseString string) (NameParser, error) {
-	return NewNameParser(parseString), nil
+func initNameParser(parseString string) (parser.NameParser, error) {
+	return parser.NewNameParser(parser.Separator(parseString)), nil
 }
 
 func Run(fullname string, parseString string) error {
@@ -13,7 +17,7 @@ func Run(fullname string, parseString string) error {
 		return err
 	}
 
-	name, err := p.Parse(fullname)
+	name, err := p.Parse(parser.FullName(fullname))
 	if err != nil {
 		return err
 	}

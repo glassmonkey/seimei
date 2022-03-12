@@ -28,35 +28,34 @@ func TestRun(t *testing.T) {
 			inputName:   "田中太郎",
 			inputParser: " ",
 			want:        "田中 太郎",
-			skip:        false,
+			skip:        true,
 		},
 		{
 			name:        "分割文字列が反映される",
 			inputName:   "田中太郎",
 			inputParser: "/",
 			want:        "田中/太郎",
-			skip:        false,
+			skip:        true,
 		},
 		{
 			name:        "ルールベースで動作する",
 			inputName:   "乙一",
 			inputParser: " ",
 			want:        "乙 一",
-			skip:        false,
+			skip:        true,
 		},
 		{
 			name:        "統計量ベースで動作する(仮実装)",
 			inputName:   "竈門炭治郎",
 			inputParser: " ",
 			want:        "竈門 炭治郎",
-			skip:        false,
+			skip:        true,
 		},
 		{
 			name:        "統計量ベースで動作しない(仮実装)",
 			inputName:   "中曽根康弘",
 			inputParser: " ",
-
-			skip: true,
+			skip:        true,
 		},
 	}
 	//nolint:paralleltest

@@ -29,7 +29,15 @@ func (n FirstName) Length() int {
 	return utf8.RuneCountInString(string(n))
 }
 
+func (n FirstName) Slice() []rune {
+	return []rune(n)
+}
+
 type LastName string
+
+func (n LastName) Slice() []rune {
+	return []rune(n)
+}
 
 func (n LastName) Length() int {
 	return utf8.RuneCountInString(string(n))

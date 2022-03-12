@@ -1,4 +1,4 @@
-package seimei
+package parser
 
 import (
 	"errors"
@@ -9,10 +9,8 @@ import (
 type Algorithm string
 
 const (
-	Rule                   = Algorithm("rule")
-	Dummy                  = Algorithm("dummy")
-	minNameLength          = 2
-	separateConditionCount = 2
+	Dummy         = Algorithm("dummy")
+	minNameLength = 2
 )
 
 var ErrTextLength = errors.New("name length needs at least 2 chars")

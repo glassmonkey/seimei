@@ -1,8 +1,13 @@
-package seimei
+package parser
 
 import (
 	"regexp"
 	"unicode/utf8"
+)
+
+const (
+	Rule                   = Algorithm("rule")
+	separateConditionCount = 2
 )
 
 func NewRuleBaseParser() RuleBaseParser {

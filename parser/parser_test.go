@@ -1,10 +1,10 @@
-package seimei_test
+package parser_test
 
 import (
 	"errors"
 	"testing"
 
-	"github.com/glassmonkey/seimei"
+	"github.com/glassmonkey/seimei/parser"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -13,14 +13,14 @@ import (
 func TestNameParser_Parse(t *testing.T) {
 	t.Parallel()
 
-	sut := seimei.NewNameParser("/")
+	sut := parser.NewNameParser("/")
 	got, err := sut.Parse("田中太郎")
-	want := seimei.DividedName{
+	want := parser.DividedName{
 		LastName:  "田中",
 		FirstName: "太郎",
 		Separator: "/",
 		Score:     0,
-		Algorithm: seimei.Dummy,
+		Algorithm: parser.Dummy,
 	}
 
 	if err != nil {
@@ -35,9 +35,9 @@ func TestNameParser_Parse(t *testing.T) {
 func TestNameParser_Parse_Validate(t *testing.T) {
 	t.Parallel()
 
-	sut := seimei.NewNameParser("/")
+	sut := parser.NewNameParser("/")
 	_, gotErr := sut.Parse("あ")
-	wantErr := seimei.ErrTextLength
+	wantErr := parser.ErrTextLength
 
 	if !errors.Is(gotErr, wantErr) {
 		t.Errorf("error is not expected, got error=(%v), want error=(%v)", gotErr, wantErr)
@@ -47,14 +47,14 @@ func TestNameParser_Parse_Validate(t *testing.T) {
 func TestNameParser_Parse_SingleFirstNameAndSingleLastName(t *testing.T) {
 	t.Parallel()
 
-	sut := seimei.NewNameParser("/")
+	sut := parser.NewNameParser("/")
 	got, err := sut.Parse("乙一")
-	want := seimei.DividedName{
+	want := parser.DividedName{
 		LastName:  "乙",
 		FirstName: "一",
 		Separator: "/",
 		Score:     1,
-		Algorithm: seimei.Rule,
+		Algorithm: parser.Rule,
 	}
 
 	if err != nil {
@@ -69,14 +69,14 @@ func TestNameParser_Parse_SingleFirstNameAndSingleLastName(t *testing.T) {
 func TestNameParser_Parse_NameHasNotKanji(t *testing.T) {
 	t.Parallel()
 
-	sut := seimei.NewNameParser("/")
+	sut := parser.NewNameParser("/")
 	got, err := sut.Parse("関ヶ原タロウ")
-	want := seimei.DividedName{
+	want := parser.DividedName{
 		LastName:  "関ヶ原",
 		FirstName: "タロウ",
 		Separator: "/",
 		Score:     1,
-		Algorithm: seimei.Rule,
+		Algorithm: parser.Rule,
 	}
 
 	if err != nil {
@@ -91,14 +91,14 @@ func TestNameParser_Parse_NameHasNotKanji(t *testing.T) {
 func TestNameParser_Parse_NameHasNotKanjiName(t *testing.T) {
 	t.Parallel()
 
-	sut := seimei.NewNameParser("/")
+	sut := parser.NewNameParser("/")
 	got, err := sut.Parse("中山マサ")
-	want := seimei.DividedName{
+	want := parser.DividedName{
 		LastName:  "中山",
 		FirstName: "マサ",
 		Separator: "/",
 		Score:     1,
-		Algorithm: seimei.Rule,
+		Algorithm: parser.Rule,
 	}
 
 	if err != nil {

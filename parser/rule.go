@@ -1,8 +1,8 @@
 package parser
 
 import (
+	"fmt"
 	"regexp"
-	"unicode/utf8"
 )
 
 const (
@@ -24,12 +24,17 @@ type RuleBaseParser struct {
 
 // Parse referer: https://github.com/rskmoi/namedivider-python/blob/master/namedivider/name_divider.py#L238
 func (p RuleBaseParser) Parse(fullname FullName, separator Separator) (DividedName, error) {
-	length := utf8.RuneCountInString(string(fullname))
+	length := fullname.Length()
 
 	if length == minNameLength {
+		l, f, err := fullname.Split(1)
+		if err != nil {
+			return DividedName{}, fmt.Errorf("rule parser error: %w", err)
+		}
+
 		return DividedName{
-			FirstName: string([]rune(fullname)[1:2]),
-			LastName:  string([]rune(fullname)[0:1]),
+			FirstName: f,
+			LastName:  l,
 			Separator: separator,
 			Score:     1,
 			Algorithm: Rule,
@@ -38,15 +43,20 @@ func (p RuleBaseParser) Parse(fullname FullName, separator Separator) (DividedNa
 
 	isKanjiList := make([]bool, length)
 
-	for i, c := range []rune(fullname) {
+	for i, c := range fullname.Slice() {
 		isKanji := p.re.MatchString(string(c))
 		isKanjiList[i] = isKanji
 
 		if i >= separateConditionCount {
 			if isKanjiList[0] != isKanji && isKanjiList[i-1] == isKanji {
+				l, f, err := fullname.Split(i - 1)
+				if err != nil {
+					return DividedName{}, fmt.Errorf("rule parser error: %w", err)
+				}
+
 				return DividedName{
-					FirstName: string([]rune(fullname)[i-1:]),
-					LastName:  string([]rune(fullname)[:i-1]),
+					FirstName: f,
+					LastName:  l,
 					Separator: separator,
 					Score:     1,
 					Algorithm: Rule,

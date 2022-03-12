@@ -13,12 +13,41 @@ const (
 	minNameLength = 2
 )
 
-var ErrTextLength = errors.New("name length needs at least 2 chars")
+var (
+	ErrNameLength    = errors.New("name length needs at least 2 chars")
+	ErrSplitPosition = errors.New("split position is invalid")
+)
 
 type Parser interface {
 	Parse(fullname FullName, separator Separator) (DividedName, error)
 }
 type FullName string
+
+type FirstName string
+
+type LastName string
+
+func (f FullName) Length() int {
+	return utf8.RuneCountInString(string(f))
+}
+
+func (f FullName) Split(position int) (LastName, FirstName, error) {
+	length := f.Length()
+
+	if position < 0 {
+		return "", "", fmt.Errorf("%w: position(=%d) must be positive", ErrSplitPosition, position)
+	}
+
+	if length < position {
+		return "", "", fmt.Errorf("%w: position(=%d) is over text length(=%d)", ErrSplitPosition, position, length)
+	}
+
+	return LastName([]rune(f)[:position]), FirstName([]rune(f)[position:]), nil
+}
+
+func (f FullName) Slice() []rune {
+	return []rune(f)
+}
 
 type Separator string
 
@@ -30,6 +59,7 @@ type NameParser struct {
 func NewNameParser(separatorString Separator) NameParser {
 	s := make([]Parser, 0)
 	s = append(s, NewRuleBaseParser())
+	s = append(s, NewStatisticsParser())
 
 	return NameParser{
 		Parsers:   s,
@@ -63,25 +93,23 @@ func (n NameParser) Parse(fullname FullName) (DividedName, error) {
 }
 
 func (n NameParser) validate(fullname FullName) error {
-	v := utf8.RuneCountInString(string(fullname))
-
-	if v < minNameLength {
-		return ErrTextLength
+	if fullname.Length() < minNameLength {
+		return ErrNameLength
 	}
 
 	return nil
 }
 
 type DividedName struct {
-	FirstName string
-	LastName  string
+	FirstName FirstName
+	LastName  LastName
 	Separator Separator
 	Score     float64
 	Algorithm Algorithm
 }
 
 func (n DividedName) String() string {
-	return n.LastName + string(n.Separator) + n.FirstName
+	return string(n.LastName) + string(n.Separator) + string(n.FirstName)
 }
 
 //nolint:exhaustivestruct

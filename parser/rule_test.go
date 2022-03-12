@@ -19,6 +19,17 @@ func TestRuleBaseParser_Parse(t *testing.T) {
 	separator := parser.Separator("/")
 	tests := []testdata{
 		{
+			name:  "2文字の場合",
+			input: "乙一",
+			want: parser.DividedName{
+				LastName:  "乙",
+				FirstName: "一",
+				Separator: separator,
+				Score:     1,
+				Algorithm: parser.Rule,
+			},
+		},
+		{
 			name:  "カタカナの名前の場合",
 			input: "中山マサ",
 			want: parser.DividedName{

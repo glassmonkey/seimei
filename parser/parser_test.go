@@ -8,27 +8,74 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-//nolint:godox
-// TODO: Refactor parameterized test.
 func TestNameParser_Parse(t *testing.T) {
 	t.Parallel()
 
-	sut := parser.NewNameParser("/")
-	got, err := sut.Parse("田中太郎")
-	want := parser.DividedName{
-		LastName:  "田中",
-		FirstName: "太郎",
-		Separator: "/",
-		Score:     0,
-		Algorithm: parser.Dummy,
+	type testdata struct {
+		name  string
+		input parser.FullName
+		want  parser.DividedName
+		skip  bool
 	}
 
-	if err != nil {
-		t.Errorf("error is not nil, err=%v", err)
+	separator := parser.Separator("/")
+	tests := []testdata{
+		{
+			name:  "ルールベースの場合",
+			input: "中山マサ",
+			want: parser.DividedName{
+				LastName:  "中山",
+				FirstName: "マサ",
+				Separator: separator,
+				Score:     1,
+				Algorithm: parser.Rule,
+			},
+			skip: false,
+		},
+		{
+			name:  "フルネームが漢字の場合",
+			input: "田中太郎",
+			want: parser.DividedName{
+				LastName:  "田中",
+				FirstName: "太郎",
+				Separator: "/",
+				Score:     0,
+				Algorithm: parser.Dummy,
+			},
+			skip: false,
+		},
+		{
+			name:  "フルネームが漢字の場合",
+			input: "竈門炭治郎",
+			want: parser.DividedName{
+				LastName:  "竈門",
+				FirstName: "炭治郎",
+				Separator: "/",
+				Score:     0,
+				Algorithm: parser.Dummy,
+			},
+			//nolint:godoc
+			skip: true, //todo: implemented
+		},
 	}
 
-	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("divided name mismatch (-got +want):\n%s", diff)
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if tt.skip {
+				t.Skip()
+			}
+			sut := parser.NewNameParser(separator)
+			got, err := sut.Parse(tt.input)
+			if err != nil {
+				t.Errorf("error is not nil, err=%v", err)
+			}
+
+			if diff := cmp.Diff(got, tt.want); diff != "" {
+				t.Errorf("divided name mismatch (-got +want):\n%s", diff)
+			}
+		})
 	}
 }
 
@@ -41,49 +88,5 @@ func TestNameParser_Parse_Validate(t *testing.T) {
 
 	if !errors.Is(gotErr, wantErr) {
 		t.Errorf("error is not expected, got error=(%v), want error=(%v)", gotErr, wantErr)
-	}
-}
-
-func TestNameParser_Parse_SingleFirstNameAndSingleLastName(t *testing.T) {
-	t.Parallel()
-
-	sut := parser.NewNameParser("/")
-	got, err := sut.Parse("乙一")
-	want := parser.DividedName{
-		LastName:  "乙",
-		FirstName: "一",
-		Separator: "/",
-		Score:     1,
-		Algorithm: parser.Rule,
-	}
-
-	if err != nil {
-		t.Errorf("error is not nil, err=%v", err)
-	}
-
-	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("divided name mismatch (-got +want):\n%s", diff)
-	}
-}
-
-func TestNameParser_Parse_NameHasNotKanjiName(t *testing.T) {
-	t.Parallel()
-
-	sut := parser.NewNameParser("/")
-	got, err := sut.Parse("中山マサ")
-	want := parser.DividedName{
-		LastName:  "中山",
-		FirstName: "マサ",
-		Separator: "/",
-		Score:     1,
-		Algorithm: parser.Rule,
-	}
-
-	if err != nil {
-		t.Errorf("error is not nil, err=%v", err)
-	}
-
-	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("divided name mismatch (-got +want):\n%s", diff)
 	}
 }

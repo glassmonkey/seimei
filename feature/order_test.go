@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestKanjiFeatureOrderCalculator_Score(t *testing.T) {
+func TestKanjiOrderFeatureCalculator_Score(t *testing.T) {
 	t.Parallel()
 
 	type testdata struct {
@@ -55,7 +55,7 @@ func TestKanjiFeatureOrderCalculator_Score(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			sut := feature.KanjiFeatureOrderCalculator{
+			sut := feature.KanjiOrderFeatureCalculator{
 				Manager: stubKanjiManagerForOrderFeature(),
 			}
 			got, err := sut.Score(tt.inputName, tt.inputFullNameLength)

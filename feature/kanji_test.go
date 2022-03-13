@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestKanjiFeatureOrderCalculator_OrderMask(t *testing.T) {
+func TestKanjiOrderFeatureCalculator_OrderMask(t *testing.T) {
 	t.Parallel()
 
 	type testdata struct {
@@ -126,7 +126,7 @@ func TestKanjiFeatureOrderCalculator_OrderMask(t *testing.T) {
 	}
 }
 
-func TestKanjiFeatureOrderCalculator_LengthMask(t *testing.T) {
+func TestKanjiOrderFeatureCalculator_LengthMask(t *testing.T) {
 	t.Parallel()
 
 	type testdata struct {
@@ -249,7 +249,7 @@ func TestKanjiFeatureOrderCalculator_LengthMask(t *testing.T) {
 	}
 }
 
-func TestKanjiFeatureOrderCalculator_SelectFeaturePosition(t *testing.T) {
+func TestKanjiOrderFeatureCalculator_SelectOrderFeaturePosition(t *testing.T) {
 	t.Parallel()
 
 	type testdata struct {
@@ -326,7 +326,7 @@ func TestKanjiFeatureOrderCalculator_SelectFeaturePosition(t *testing.T) {
 			sut := feature.KanjiFeatureManager{
 				KanjiFeatureMap: map[feature.Character]feature.KanjiFeature{},
 			}
-			got, err := sut.SelectFeatureOrderPosition(tt.inputName, tt.inputPosition)
+			got, err := sut.SelectOrderFeaturePosition(tt.inputName, tt.inputPosition)
 			if !errors.Is(err, tt.wantErr) {
 				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
 			}

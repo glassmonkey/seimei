@@ -12,14 +12,14 @@ const (
 
 func NewStatisticsParser(m feature.KanjiFeatureManager) StatisticsParser {
 	return StatisticsParser{
-		OrderCalculator: feature.KanjiFeatureOrderCalculator{
+		OrderCalculator: feature.KanjiOrderFeatureCalculator{
 			Manager: m,
 		},
 	}
 }
 
 type StatisticsParser struct {
-	OrderCalculator feature.KanjiFeatureOrderCalculator
+	OrderCalculator feature.KanjiOrderFeatureCalculator
 }
 
 func (s StatisticsParser) Parse(fullname FullName, separator Separator) (DividedName, error) {

@@ -2,11 +2,11 @@ package feature
 
 import "fmt"
 
-type KanjiFeatureOrderCalculator struct {
+type KanjiOrderFeatureCalculator struct {
 	Manager KanjiFeatureManager
 }
 
-func (fc KanjiFeatureOrderCalculator) Score(pieceOfName PartOfNameCharacters, fullNameLength int) (float64, error) {
+func (fc KanjiOrderFeatureCalculator) Score(pieceOfName PartOfNameCharacters, fullNameLength int) (float64, error) {
 	score := 0.0
 	offset := 0
 
@@ -25,7 +25,7 @@ func (fc KanjiFeatureOrderCalculator) Score(pieceOfName PartOfNameCharacters, fu
 			return 0.0, fmt.Errorf("failed order score: %w", err)
 		}
 
-		index, err := fc.Manager.SelectFeatureOrderPosition(pieceOfName, i)
+		index, err := fc.Manager.SelectOrderFeaturePosition(pieceOfName, i)
 		if err != nil {
 			return 0.0, fmt.Errorf("failed order score: %w", err)
 		}

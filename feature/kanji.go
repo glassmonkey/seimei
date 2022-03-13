@@ -102,7 +102,7 @@ func (m KanjiFeatureManager) maskLengthFuturesForPart(min, max int) []float64 {
 	return f
 }
 
-func (m KanjiFeatureManager) SelectFeatureOrderPosition(pieceOfName PartOfNameCharacters, positionInPieceOfName int) (OrderFeatureIndexPosition, error) {
+func (m KanjiFeatureManager) SelectOrderFeaturePosition(pieceOfName PartOfNameCharacters, positionInPieceOfName int) (OrderFeatureIndexPosition, error) {
 	if positionInPieceOfName < 0 || positionInPieceOfName >= pieceOfName.Length() {
 		return 0, ErrOutRangeFeatureIndex
 	}

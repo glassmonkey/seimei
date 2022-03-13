@@ -67,7 +67,7 @@ func TestStatisticsParser_Parse(t *testing.T) {
 				t.Skip()
 			}
 			sut := parser.StatisticsParser{
-				OrderCalculator: feature.KanjiFeatureOrderCalculator{
+				OrderCalculator: feature.KanjiOrderFeatureCalculator{
 					Manager: seimei.InitKanjiFeatureManager(),
 				},
 			}

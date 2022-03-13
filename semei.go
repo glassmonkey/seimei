@@ -63,11 +63,12 @@ func InitKanjiFeatureManager() feature.KanjiFeatureManager {
 			ls = append(ls, s)
 		}
 
-		m[c] = feature.KanjiFeature{
-			Character: c,
-			Order:     os,
-			Length:    ls,
+		kf, err := feature.NewKanjiFeature(c, os, ls)
+		if err != nil {
+			panic(err)
 		}
+
+		m[c] = kf
 	}
 
 	return feature.KanjiFeatureManager{

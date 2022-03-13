@@ -44,7 +44,6 @@ func InitKanjiFeatureManager() feature.KanjiFeatureManager {
 		var os, ls []float64
 
 		for _, o := range record[feature.CharacterFeatureSize : feature.CharacterFeatureSize+feature.OrderFeatureSize] {
-			//nolint:gomnd
 			s, err := strconv.ParseFloat(o, 64)
 			if err != nil {
 				panic(err)
@@ -54,7 +53,6 @@ func InitKanjiFeatureManager() feature.KanjiFeatureManager {
 		}
 
 		for _, l := range record[feature.CharacterFeatureSize+feature.OrderFeatureSize : feature.CharacterFeatureSize+feature.OrderFeatureSize+feature.LengthFeatureSize] {
-			//nolint:gomnd
 			s, err := strconv.ParseFloat(l, 64)
 			if err != nil {
 				panic(err)

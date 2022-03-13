@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestKanjiOrderFeatureCalculator_Score(t *testing.T) {
+func TestKanjiLengthFeatureCalculator_Score(t *testing.T) {
 	t.Parallel()
 
 	type testdata struct {
@@ -25,14 +25,14 @@ func TestKanjiOrderFeatureCalculator_Score(t *testing.T) {
 			name:                "名字",
 			inputName:           parser.FirstName("冬馬"),
 			inputFullNameLength: 5,
-			wantSrore:           1.0 / 3, // 1/4
+			wantSrore:           1.0 / 4,
 			wantErr:             nil,
 		},
 		{
 			name:                "名前",
 			inputName:           parser.LastName("天ケ瀬"),
 			inputFullNameLength: 5,
-			wantSrore:           0.5833333333333333, // 1/4 + 1/3
+			wantSrore:           1.0 / 2,
 			wantErr:             nil,
 		},
 		{
@@ -55,8 +55,8 @@ func TestKanjiOrderFeatureCalculator_Score(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			sut := feature.KanjiOrderFeatureCalculator{
-				Manager: stubKanjiManagerForOrderFeature(),
+			sut := feature.KanjiLengthFeatureCalculator{
+				Manager: stubKanjiManagerForLengthFeature(),
 			}
 			got, err := sut.Score(tt.inputName, tt.inputFullNameLength)
 			if !errors.Is(err, tt.wantErr) {
@@ -73,7 +73,7 @@ func TestKanjiOrderFeatureCalculator_Score(t *testing.T) {
 	}
 }
 
-func stubKanjiManagerForOrderFeature() feature.KanjiFeatureManager {
+func stubKanjiManagerForLengthFeature() feature.KanjiFeatureManager {
 	o := feature.Features{1, 1, 1, 1, 1, 1}
 	l := feature.Features{1, 1, 1, 1, 1, 1, 1, 1}
 

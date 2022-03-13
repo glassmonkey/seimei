@@ -190,7 +190,7 @@ func TestFullName_Sprint(t *testing.T) {
 			sut := tt.input
 			l, f, err := sut.Split(tt.inputPosition)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
+				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
 			}
 			if tt.wantErr != nil {
 				return

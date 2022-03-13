@@ -113,7 +113,8 @@ func (n NameParser) Parse(fullname FullName) (DividedName, error) {
 			return v, nil
 		}
 	}
-
+	// Currently, the process here is not reached.
+	// The statistics parser covers all the remains.
 	return DividedName{}, ErrParserNotWorking
 }
 

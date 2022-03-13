@@ -24,28 +24,28 @@ const (
 
 type KanjiFeatureOrderCalculator struct{}
 
-func (fc KanjiFeatureOrderCalculator) Mask(fullNameLength, charPosition int) (OrderFeature, error) {
+func (fc KanjiFeatureOrderCalculator) Mask(fullNameLength, charPosition int) (Features, error) {
 	if charPosition == 0 || charPosition == fullNameLength-1 {
-		return OrderFeature{}, ErrInvalidOrderMask
+		return Features{}, ErrInvalidOrderMask
 	}
 
 	if charPosition < 0 || charPosition >= fullNameLength {
-		return OrderFeature{}, ErrOutRangeOrderMask
+		return Features{}, ErrOutRangeOrderMask
 	}
 	//nolint:gomnd
 	if fullNameLength == 3 {
-		return NewOrderFeature([]float64{0, 0, 1, 1, 0, 0})
+		return Features{0, 0, 1, 1, 0, 0}, nil
 	}
 
 	if charPosition == 1 {
-		return NewOrderFeature([]float64{0, 1, 1, 1, 0, 0})
+		return Features{0, 1, 1, 1, 0, 0}, nil
 	}
 
 	if charPosition == fullNameLength-2 {
-		return NewOrderFeature([]float64{0, 0, 1, 1, 1, 0})
+		return Features{0, 0, 1, 1, 1, 0}, nil
 	}
 
-	return NewOrderFeature([]float64{0, 1, 1, 1, 1, 0})
+	return Features{0, 1, 1, 1, 1, 0}, nil
 }
 
 func (fc KanjiFeatureOrderCalculator) SelectFeaturePosition(pieceOfName PartOfNameCharacters, positionInPieceOfName int) (OrderFeatureIndexPosition, error) {

@@ -2,7 +2,6 @@ package feature
 
 import (
 	"errors"
-	"fmt"
 )
 
 const (
@@ -26,66 +25,41 @@ func (m KanjiFeatureManager) Get(c Character) KanjiFeature {
 	if !ok {
 		return DefaultKanjiFeature()
 	}
-
 	return v
 }
 
 func DefaultKanjiFeature() KanjiFeature {
 	return KanjiFeature{
 		Character: "Default",
-		Order:     defaultOrderFeature(),
-		Length:    defaultLengthFeature(),
+		Order:     defaultFeature(OrderFeatureSize),
+		Length:    defaultFeature(LengthFeatureSize),
 	}
 }
 
-type OrderFeature []float64
+type Features []float64
 
-func NewOrderFeature(d []float64) (OrderFeature, error) {
-	if len(d) != OrderFeatureSize {
-		return OrderFeature{}, ErrOrderFeatureInvalidSize
-	}
-
-	return d, nil
-}
-
-func defaultOrderFeature() OrderFeature {
-	return []float64{0, 0, 0, 0, 0, 0}
-}
-
-type LengthFeature []float64
-
-func NewLengthFeature(d []float64) (LengthFeature, error) {
-	if len(d) != LengthFeatureSize {
-		return LengthFeature{}, ErrLengthFeatureInvalidSize
-	}
-
-	return d, nil
-}
-
-func defaultLengthFeature() LengthFeature {
-	return []float64{0, 0, 0, 0, 0, 0, 0, 0}
+func defaultFeature(size int) Features {
+	return make(Features, size)
 }
 
 type KanjiFeature struct {
 	Character Character
-	Order     OrderFeature
-	Length    LengthFeature
+	Order     Features
+	Length    Features
 }
 
 func NewKanjiFeature(c Character, o, l []float64) (KanjiFeature, error) {
-	of, err := NewOrderFeature(o)
-	if err != nil {
-		return KanjiFeature{}, fmt.Errorf("failed create kanji feature: %w", err)
+	if len(o) != OrderFeatureSize {
+		return KanjiFeature{}, ErrOrderFeatureInvalidSize
 	}
 
-	lf, err := NewLengthFeature(l)
-	if err != nil {
-		return KanjiFeature{}, fmt.Errorf("failed create kanji feature: %w", err)
+	if len(l) != LengthFeatureSize {
+		return KanjiFeature{}, ErrLengthFeatureInvalidSize
 	}
 
 	return KanjiFeature{
 		Character: c,
-		Order:     of,
-		Length:    lf,
+		Order:     o,
+		Length:    l,
 	}, nil
 }

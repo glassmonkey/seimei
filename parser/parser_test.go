@@ -66,6 +66,7 @@ func TestNameParser_Parse(t *testing.T) {
 			if tt.skip {
 				t.Skip()
 			}
+			//nolint:exhaustivestruct
 			sut := parser.NewNameParser(separator, feature.KanjiFeatureManager{})
 			got, err := sut.Parse(tt.input)
 			if err != nil {
@@ -81,7 +82,7 @@ func TestNameParser_Parse(t *testing.T) {
 
 func TestNameParser_Parse_Validate(t *testing.T) {
 	t.Parallel()
-
+	//nolint:exhaustivestruct
 	sut := parser.NewNameParser("/", feature.KanjiFeatureManager{})
 	_, gotErr := sut.Parse("あ")
 	wantErr := parser.ErrNameLength

@@ -23,6 +23,7 @@ type KanjiFeatureOrderCalculator struct {
 func (fc KanjiFeatureOrderCalculator) Score(pieceOfName PartOfNameCharacters, fullNameLength int) (float64, error) {
 	score := 0.0
 	offset := 0
+
 	if !pieceOfName.IsLastName() {
 		offset = fullNameLength - pieceOfName.Length()
 	}
@@ -52,6 +53,7 @@ func (fc KanjiFeatureOrderCalculator) Score(pieceOfName PartOfNameCharacters, fu
 		if total == 0 {
 			continue
 		}
+
 		v := os[index] / total
 		score += v
 	}

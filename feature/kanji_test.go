@@ -108,7 +108,9 @@ func TestKanjiFeatureOrderCalculator_Mask(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			sut := feature.KanjiFeatureManager{}
+			sut := feature.KanjiFeatureManager{
+				KanjiFeatureMap: map[feature.Character]feature.KanjiFeature{},
+			}
 			got, err := sut.Mask(tt.inputLength, tt.inputPosition)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
@@ -198,7 +200,9 @@ func TestKanjiFeatureOrderCalculator_SelectFeaturePosition(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			sut := feature.KanjiFeatureManager{}
+			sut := feature.KanjiFeatureManager{
+				KanjiFeatureMap: map[feature.Character]feature.KanjiFeature{},
+			}
 			got, err := sut.SelectFeaturePosition(tt.inputName, tt.inputPosition)
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)

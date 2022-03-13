@@ -2,6 +2,7 @@ package feature
 
 import (
 	"errors"
+	"fmt"
 )
 
 var (
@@ -22,7 +23,9 @@ const (
 	OrderEndFeatureIndex    = OrderFeatureIndexPosition(2)
 )
 
-type KanjiFeatureOrderCalculator struct{}
+type KanjiFeatureOrderCalculator struct {
+	Manager KanjiFeatureManager
+}
 
 func (fc KanjiFeatureOrderCalculator) Mask(fullNameLength, charPosition int) (Features, error) {
 	if charPosition == 0 || charPosition == fullNameLength-1 {
@@ -76,30 +79,41 @@ func (fc KanjiFeatureOrderCalculator) SelectFeaturePosition(pieceOfName PartOfNa
 	return OrderEndFeatureIndex.MoveFirstNameIndex(), nil
 }
 
-// Score patch work implementation.
-func (fc KanjiFeatureOrderCalculator) Score(pieceOfName PartOfNameCharacters, fullNameLength, startPosition int) (float64, error) {
-	// isLastName := startPosition == 0
+func (fc KanjiFeatureOrderCalculator) Score(pieceOfName PartOfNameCharacters, fullNameLength int) (float64, error) {
 	score := 0.0
-	/*
-		for i, c := range pieceOfName.Slice() {
-			ci := i + startPosition
-			if ci == 0 {
-				continue
-			}
-			if ci == fullNameLength-1 {
-				continue
-			}
-			mask, err := fc.Mask(fullNameLength, ci)
-			if err != nil {
-				return 0.0, fmt.Errorf("failed order score: %w", err)
-			}
-			// idx := c.Status(pieceOfName, i, isLastName)
-			// currentScores := self.kanji_dict.get(c, self.default_kanji).order_counts * mask
-			//scores = fucn(c, mask)
-			//total = score.sum()
-			// if total == 0 continue
-			// scores.get(idx) / total
-			score += 0
-		}*/
+	offset := 0
+	if !pieceOfName.IsLastName() {
+		offset = fullNameLength - pieceOfName.Length()
+	}
+
+	for i, c := range pieceOfName.Slice() {
+		ci := i + offset
+		if ci == 0 || ci == fullNameLength-1 {
+			continue
+		}
+
+		mask, err := fc.Mask(fullNameLength, ci)
+		if err != nil {
+			return 0.0, fmt.Errorf("failed order score: %w", err)
+		}
+
+		index, err := fc.SelectFeaturePosition(pieceOfName, i)
+		if err != nil {
+			return 0.0, fmt.Errorf("failed order score: %w", err)
+		}
+
+		os, err := fc.Manager.Get(Character(c)).Order.Multiple(mask)
+		if err != nil {
+			return 0.0, fmt.Errorf("failed order score: %w", err)
+		}
+
+		total := os.Sum()
+		if total == 0 {
+			continue
+		}
+		v := os[index] / total
+		score += v
+	}
+
 	return score, nil
 }

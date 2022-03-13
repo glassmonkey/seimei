@@ -54,7 +54,6 @@ func (m KanjiFeatureManager) OrderMask(fullNameLength, charPosition int) (Featur
 	if charPosition < 0 || charPosition >= fullNameLength {
 		return Features{}, ErrOutRangeOrderMask
 	}
-	//nolint:gomnd
 	if fullNameLength == 3 {
 		return Features{0, 0, 1, 1, 0, 0}, nil
 	}

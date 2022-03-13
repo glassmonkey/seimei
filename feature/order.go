@@ -17,7 +17,6 @@ func (i OrderFeatureIndexPosition) MoveFirstNameIndex() OrderFeatureIndexPositio
 }
 
 const (
-	OrderFeatureSize        = 6
 	OrderFirstFeatureIndex  = OrderFeatureIndexPosition(0)
 	OrderMiddleFeatureIndex = OrderFeatureIndexPosition(1)
 	OrderEndFeatureIndex    = OrderFeatureIndexPosition(2)

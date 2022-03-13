@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestKanjiFeatureOrderCalculator_Mask(t *testing.T) {
+func TestKanjiFeatureOrderCalculator_OrderMask(t *testing.T) {
 	t.Parallel()
 
 	type testdata struct {
@@ -112,6 +112,129 @@ func TestKanjiFeatureOrderCalculator_Mask(t *testing.T) {
 				KanjiFeatureMap: map[feature.Character]feature.KanjiFeature{},
 			}
 			got, err := sut.OrderMask(tt.inputLength, tt.inputPosition)
+			if !errors.Is(err, tt.wantErr) {
+				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
+			}
+			if tt.wantErr != nil {
+				return
+			}
+
+			if diff := cmp.Diff(got, tt.wantMask); diff != "" {
+				t.Errorf("mask value mismatch (-got +want):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestKanjiFeatureOrderCalculator_LengthMask(t *testing.T) {
+	t.Parallel()
+
+	type testdata struct {
+		name          string
+		inputLength   int
+		inputPosition int
+		wantMask      feature.Features
+		wantErr       error
+	}
+
+	tests := []testdata{
+		{
+			name:          "-1文字目指定",
+			inputLength:   5,
+			inputPosition: -1,
+			wantMask:      feature.Features{},
+			wantErr:       feature.ErrOutRangeOrderMask,
+		},
+		{
+			name:          "(1/5)文字目指定",
+			inputLength:   5,
+			inputPosition: 0,
+			wantMask: feature.Features{
+				1, 1, 1, 1, 0, 0, 0, 0,
+			},
+			wantErr: nil,
+		},
+		{
+			name:          "(2/5)文字目指定",
+			inputLength:   5,
+			inputPosition: 1,
+			wantMask: feature.Features{
+				0, 1, 1, 1, 0, 0, 0, 1,
+			},
+			wantErr: nil,
+		},
+		{
+			name:          "(3/5)文字目指定",
+			inputLength:   5,
+			inputPosition: 2,
+			wantMask: feature.Features{
+				0, 0, 1, 1, 0, 0, 1, 1,
+			},
+			wantErr: nil,
+		},
+		{
+			name:          "(4/5)文字目指定",
+			inputLength:   5,
+			inputPosition: 3,
+			wantMask: feature.Features{
+				0, 0, 0, 1, 0, 1, 1, 1,
+			},
+			wantErr: nil,
+		},
+		{
+			name:          "(5/5)文字目指定",
+			inputLength:   5,
+			inputPosition: 4,
+			wantMask: feature.Features{
+				0, 0, 0, 0, 1, 1, 1, 1,
+			},
+			wantErr: nil,
+		},
+		{
+			name:          "5文字目指定",
+			inputLength:   5,
+			inputPosition: 5,
+			wantMask:      feature.Features{},
+			wantErr:       feature.ErrOutRangeOrderMask,
+		},
+		{
+			name:          "(1/3)文字目指定",
+			inputLength:   3,
+			inputPosition: 0,
+			wantMask: feature.Features{
+				1, 1, 0, 0, 0, 0, 0, 0,
+			},
+			wantErr: nil,
+		},
+		{
+			name:          "(2/3)文字目指定",
+			inputLength:   3,
+			inputPosition: 1,
+			wantMask: feature.Features{
+				0, 1, 0, 0, 0, 1, 0, 0,
+			},
+			wantErr: nil,
+		},
+		{
+			name:          "(3/3)文字目指定",
+			inputLength:   3,
+			inputPosition: 2,
+			wantMask: feature.Features{
+				0, 0, 0, 0, 1, 1, 0, 0,
+			},
+			wantErr: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			sut := feature.KanjiFeatureManager{
+				KanjiFeatureMap: map[feature.Character]feature.KanjiFeature{},
+			}
+			got, err := sut.LengthMask(tt.inputLength, tt.inputPosition)
 			if !errors.Is(err, tt.wantErr) {
 				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
 			}

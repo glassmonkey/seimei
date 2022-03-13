@@ -285,6 +285,14 @@ func TestKanjiFeature_GetOrderValue(t *testing.T) {
 			wantScore:     0,
 			wantErr:       feature.ErrOutRangeFeatureIndex,
 		},
+		{
+			name:          "input mask is un match size",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32},
+			inputMask:     feature.Features{1, 0, 1, 0, 1},
+			inputPosition: 0,
+			wantScore:     0,
+			wantErr:       feature.ErrInvalidFeatureSize,
+		},
 	}
 
 	for _, tt := range tests {

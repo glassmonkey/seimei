@@ -25,28 +25,28 @@ func TestKanjiOrderFeatureCalculator_Score(t *testing.T) {
 			name:                "名字",
 			inputName:           parser.FirstName("冬馬"),
 			inputFullNameLength: 5,
-			wantSrore:           0.3333333333333333, // 1/4
+			wantSrore:           1.0 / 3, // 1/4
 			wantErr:             nil,
 		},
 		{
 			name:                "名前",
 			inputName:           parser.LastName("天ケ瀬"),
 			inputFullNameLength: 5,
-			wantSrore:           0.5833333333333333, // 1/4 + 1/3
+			wantSrore:           1.0/4 + 1.0/3, // 1/4 + 1/3
 			wantErr:             nil,
 		},
 		{
 			name:                "フルネームと同じサイズ指定の場合はスコアは0",
 			inputName:           parser.LastName("天ケ瀬"),
 			inputFullNameLength: 3,
-			wantSrore:           0, // 1/4 + 1/3
+			wantSrore:           0,
 			wantErr:             nil,
 		},
 		{
 			name:                "指定文字列がフルネームより大きい場合はマスクデータの作成でエラーになる",
 			inputName:           parser.LastName("天ケ瀬"),
 			inputFullNameLength: 2,
-			wantSrore:           0, // 1/4 + 1/3
+			wantSrore:           0,
 			wantErr:             feature.ErrOutRangeOrderMask,
 		},
 	}

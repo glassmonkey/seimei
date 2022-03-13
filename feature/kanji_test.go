@@ -415,6 +415,108 @@ func TestKanjiFeature_GetOrderValue(t *testing.T) {
 	tests := []testdata{
 		{
 			name:          "mask is all 1",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32, 64, 128},
+			inputMask:     feature.Features{1, 1, 1, 1, 1, 1, 1, 1},
+			inputPosition: 0,
+			wantScore:     1.0 / (1 + 2 + 4 + 8 + 16 + 32 + 64 + 128),
+			wantErr:       nil,
+		},
+		{
+			name:          "mask is all 0",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32, 64, 128},
+			inputMask:     feature.Features{0, 0, 0, 0, 0, 0, 0, 0},
+			inputPosition: 0,
+			wantScore:     0,
+			wantErr:       nil,
+		},
+		{
+			name:          "mask is half 1",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32, 64, 128},
+			inputMask:     feature.Features{1, 0, 1, 0, 1, 0, 1, 0},
+			inputPosition: 0,
+			wantScore:     1.0 / (1 + 4 + 16 + 64),
+			wantErr:       nil,
+		},
+		{
+			name:          "mask is half 1 and target index 1",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32, 64, 128},
+			inputMask:     feature.Features{1, 0, 1, 0, 1, 0, 1, 0},
+			inputPosition: 1,
+			wantScore:     0,
+			wantErr:       nil,
+		},
+		{
+			name:          "mask is half 1 and target index 2",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32, 64, 128},
+			inputMask:     feature.Features{1, 0, 1, 0, 1, 0, 1, 0},
+			inputPosition: 2,
+			wantScore:     4.0 / (1 + 4 + 16 + 64),
+			wantErr:       nil,
+		},
+		{
+			name:          "target index -1",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32, 64, 128},
+			inputMask:     feature.Features{1, 0, 1, 0, 1, 0, 1, 0},
+			inputPosition: -1,
+			wantScore:     0,
+			wantErr:       feature.ErrOutRangeFeatureIndex,
+		},
+		{
+			name:          "target index 6",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32, 64, 128},
+			inputMask:     feature.Features{1, 0, 1, 0, 1, 0, 1, 0},
+			inputPosition: 8,
+			wantScore:     0,
+			wantErr:       feature.ErrOutRangeFeatureIndex,
+		},
+		{
+			name:          "input mask is un match size",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32, 64, 128},
+			inputMask:     feature.Features{1, 0, 1, 0, 1},
+			inputPosition: 0,
+			wantScore:     0,
+			wantErr:       feature.ErrInvalidFeatureSize,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			//nolint:exhaustivestruct
+			sut := featureFixtures(inputForFixtures{
+				orders: tt.inputFeature,
+			})
+			got, err := sut.GetOrderValue(tt.inputPosition, tt.inputMask)
+			if !errors.Is(err, tt.wantErr) {
+				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
+			}
+			if tt.wantErr != nil {
+				return
+			}
+
+			if diff := cmp.Diff(got, tt.wantScore); diff != "" {
+				t.Errorf("score value mismatch (-got +want):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestKanjiFeature_GetLengthValue(t *testing.T) {
+	t.Parallel()
+
+	type testdata struct {
+		name          string
+		inputFeature  feature.Features
+		inputPosition feature.LengthFeatureIndexPosition
+		inputMask     feature.Features
+		wantScore     float64
+		wantErr       error
+	}
+
+	tests := []testdata{
+		{
+			name:          "mask is all 1",
 			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32},
 			inputMask:     feature.Features{1, 1, 1, 1, 1, 1},
 			inputPosition: 0,
@@ -485,9 +587,9 @@ func TestKanjiFeature_GetOrderValue(t *testing.T) {
 			t.Parallel()
 			//nolint:exhaustivestruct
 			sut := featureFixtures(inputForFixtures{
-				orders: tt.inputFeature,
+				length: tt.inputFeature,
 			})
-			got, err := sut.GetOrderValue(tt.inputPosition, tt.inputMask)
+			got, err := sut.GetLengthValue(tt.inputPosition, tt.inputMask)
 			if !errors.Is(err, tt.wantErr) {
 				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
 			}

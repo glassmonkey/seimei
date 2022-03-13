@@ -204,6 +204,24 @@ func (k KanjiFeature) GetOrderValue(p OrderFeatureIndexPosition, mask Features) 
 	return os[p] / total, nil
 }
 
+func (k KanjiFeature) GetLengthValue(p LengthFeatureIndexPosition, mask Features) (float64, error) {
+	if p < 0 || p >= LengthFeatureSize {
+		return 0.0, ErrOutRangeFeatureIndex
+	}
+
+	os, err := k.Length.Multiple(mask)
+	if err != nil {
+		return 0.0, fmt.Errorf("failed order value: %w", err)
+	}
+
+	total := os.Sum()
+	if total == 0 {
+		return 0, nil
+	}
+
+	return os[p] / total, nil
+}
+
 func NewKanjiFeature(c Character, o, l []float64) (KanjiFeature, error) {
 	if len(o) != OrderFeatureSize {
 		return KanjiFeature{}, ErrOrderFeatureInvalidSize

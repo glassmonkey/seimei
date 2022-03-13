@@ -32,7 +32,7 @@ func TestKanjiOrderFeatureCalculator_Score(t *testing.T) {
 			name:                "名前",
 			inputName:           parser.LastName("天ケ瀬"),
 			inputFullNameLength: 5,
-			wantSrore:           1.0/4 + 1.0/3, // 1/4 + 1/3
+			wantSrore:           0.5833333333333333, // 1/4 + 1/3
 			wantErr:             nil,
 		},
 		{

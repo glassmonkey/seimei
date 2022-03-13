@@ -607,6 +607,7 @@ type inputForFixtures struct {
 
 func featureFixtures(t *testing.T, input inputForFixtures) feature.KanjiFeature {
 	t.Helper()
+
 	o := input.orders
 	l := input.length
 
@@ -617,9 +618,11 @@ func featureFixtures(t *testing.T, input inputForFixtures) feature.KanjiFeature 
 	if len(l) == 0 {
 		l = []float64{1, 1, 1, 1, 1, 1, 1, 1}
 	}
+
 	v, err := feature.NewKanjiFeature("dummy", o, l)
 	if err != nil {
 		t.Fatalf("kanji feature build failed: %v", err)
 	}
+
 	return v
 }

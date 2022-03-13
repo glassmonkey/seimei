@@ -56,7 +56,7 @@ func TestKanjiLengthFeatureCalculator_Score(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			sut := feature.KanjiLengthFeatureCalculator{
-				Manager: stubKanjiManagerForOrderFeature(),
+				Manager: stubKanjiManagerForLengthFeature(),
 			}
 			got, err := sut.Score(tt.inputName, tt.inputFullNameLength)
 			if !errors.Is(err, tt.wantErr) {

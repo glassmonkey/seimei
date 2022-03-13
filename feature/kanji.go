@@ -58,6 +58,7 @@ func (m KanjiFeatureManager) OrderMask(fullNameLength, charPosition int) (Featur
 	if charPosition < 0 || charPosition >= fullNameLength {
 		return Features{}, ErrOutRangeOrderMask
 	}
+
 	if fullNameLength == 3 {
 		return Features{0, 0, 1, 1, 0, 0}, nil
 	}
@@ -77,31 +78,36 @@ func (m KanjiFeatureManager) LengthMask(fullNameLength, charPosition int) (Featu
 	if charPosition < 0 || charPosition >= fullNameLength {
 		return Features{}, ErrOutRangeOrderMask
 	}
+
 	minLastName := charPosition + 1
 	maxLastName := fullNameLength - 1
 	lf := m.maskLengthFuturesForPart(minLastName, maxLastName)
 
 	minFirstName := fullNameLength - charPosition
 	maxFirstName := fullNameLength - 1
+
 	ff := m.maskLengthFuturesForPart(minFirstName, maxFirstName)
-	for _, ffv := range ff {
-		lf = append(lf, ffv)
-	}
+	lf = append(lf, ff...)
+
 	return lf, nil
 }
 
 func (m KanjiFeatureManager) maskLengthFuturesForPart(min, max int) []float64 {
 	minv := min
 	maxv := max
+
 	if maxv > LengthFeatureSize/2 {
 		maxv = LengthFeatureSize / 2
 	}
+
 	f := []float64{0, 0, 0, 0}
+
 	if minv <= maxv {
 		for i := minv - 1; i < maxv; i++ {
 			f[i] = 1
 		}
 	}
+
 	return f
 }
 
@@ -138,9 +144,11 @@ func (m KanjiFeatureManager) SelectLengthFeaturePosition(pieceOfName PartOfNameC
 	if p > LengthFeatureSize/2 {
 		p = LengthFeatureSize / 2
 	}
+
 	if pieceOfName.IsLastName() {
 		return LengthFeatureIndexPosition(p - 1), nil
 	}
+
 	return LengthFeatureIndexPosition(p - 1).MoveFirstNameIndex(), nil
 }
 

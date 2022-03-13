@@ -34,6 +34,7 @@ func (fc KanjiOrderFeatureCalculator) Score(pieceOfName PartOfNameCharacters, fu
 		if err != nil {
 			return 0.0, fmt.Errorf("failed order score: %w", err)
 		}
+
 		score += v
 	}
 

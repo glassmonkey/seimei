@@ -44,6 +44,7 @@ func NewOrderFeature(d []float64) (OrderFeature, error) {
 	if len(d) != OrderFeatureSize {
 		return OrderFeature{}, ErrOrderFeatureInvalidSize
 	}
+
 	return d, nil
 }
 
@@ -57,6 +58,7 @@ func NewLengthFeature(d []float64) (LengthFeature, error) {
 	if len(d) != LengthFeatureSize {
 		return LengthFeature{}, ErrLengthFeatureInvalidSize
 	}
+
 	return d, nil
 }
 
@@ -75,10 +77,12 @@ func NewKanjiFeature(c Character, o, l []float64) (KanjiFeature, error) {
 	if err != nil {
 		return KanjiFeature{}, fmt.Errorf("failed create kanji feature: %w", err)
 	}
+
 	lf, err := NewLengthFeature(l)
 	if err != nil {
 		return KanjiFeature{}, fmt.Errorf("failed create kanji feature: %w", err)
 	}
+
 	return KanjiFeature{
 		Character: c,
 		Order:     of,

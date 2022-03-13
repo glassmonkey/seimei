@@ -1,20 +1,6 @@
 package feature
 
-import (
-	"fmt"
-)
-
-type OrderFeatureIndexPosition int
-
-func (i OrderFeatureIndexPosition) MoveFirstNameIndex() OrderFeatureIndexPosition {
-	return i + OrderFeatureSize/2
-}
-
-const (
-	OrderFirstFeatureIndex  = OrderFeatureIndexPosition(0)
-	OrderMiddleFeatureIndex = OrderFeatureIndexPosition(1)
-	OrderEndFeatureIndex    = OrderFeatureIndexPosition(2)
-)
+import "fmt"
 
 type KanjiFeatureOrderCalculator struct {
 	Manager KanjiFeatureManager
@@ -34,27 +20,20 @@ func (fc KanjiFeatureOrderCalculator) Score(pieceOfName PartOfNameCharacters, fu
 			continue
 		}
 
-		mask, err := fc.Manager.Mask(fullNameLength, ci)
+		mask, err := fc.Manager.OrderMask(fullNameLength, ci)
 		if err != nil {
 			return 0.0, fmt.Errorf("failed order score: %w", err)
 		}
 
-		index, err := fc.Manager.SelectFeaturePosition(pieceOfName, i)
+		index, err := fc.Manager.SelectFeatureOrderPosition(pieceOfName, i)
 		if err != nil {
 			return 0.0, fmt.Errorf("failed order score: %w", err)
 		}
 
-		os, err := fc.Manager.Get(Character(c)).Order.Multiple(mask)
+		v, err := fc.Manager.Get(Character(c)).GetOrderValue(index, mask)
 		if err != nil {
 			return 0.0, fmt.Errorf("failed order score: %w", err)
 		}
-
-		total := os.Sum()
-		if total == 0 {
-			continue
-		}
-
-		v := os[index] / total
 		score += v
 	}
 

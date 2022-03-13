@@ -2,12 +2,16 @@ package feature
 
 import (
 	"errors"
+	"fmt"
 )
 
 const (
-	CharacterFeatureSize = 1
-	OrderFeatureSize     = 6
-	LengthFeatureSize    = 8
+	CharacterFeatureSize    = 1
+	OrderFeatureSize        = 6
+	LengthFeatureSize       = 8
+	OrderFirstFeatureIndex  = OrderFeatureIndexPosition(0)
+	OrderMiddleFeatureIndex = OrderFeatureIndexPosition(1)
+	OrderEndFeatureIndex    = OrderFeatureIndexPosition(2)
 )
 
 var (
@@ -18,6 +22,12 @@ var (
 	ErrInvalidOrderMask         = errors.New("first character and last character must not be created order mask")
 	ErrOutRangeFeatureIndex     = errors.New("character position is out of range when selecting features")
 )
+
+type OrderFeatureIndexPosition int
+
+func (i OrderFeatureIndexPosition) MoveFirstNameIndex() OrderFeatureIndexPosition {
+	return i + OrderFeatureSize/2
+}
 
 type Character string
 
@@ -34,7 +44,7 @@ func (m KanjiFeatureManager) Get(c Character) KanjiFeature {
 	return v
 }
 
-func (m KanjiFeatureManager) Mask(fullNameLength, charPosition int) (Features, error) {
+func (m KanjiFeatureManager) OrderMask(fullNameLength, charPosition int) (Features, error) {
 	if charPosition == 0 || charPosition == fullNameLength-1 {
 		return Features{}, ErrInvalidOrderMask
 	}
@@ -58,7 +68,7 @@ func (m KanjiFeatureManager) Mask(fullNameLength, charPosition int) (Features, e
 	return Features{0, 1, 1, 1, 1, 0}, nil
 }
 
-func (m KanjiFeatureManager) SelectFeaturePosition(pieceOfName PartOfNameCharacters, positionInPieceOfName int) (OrderFeatureIndexPosition, error) {
+func (m KanjiFeatureManager) SelectFeatureOrderPosition(pieceOfName PartOfNameCharacters, positionInPieceOfName int) (OrderFeatureIndexPosition, error) {
 	if positionInPieceOfName < 0 || positionInPieceOfName >= pieceOfName.Length() {
 		return 0, ErrOutRangeFeatureIndex
 	}
@@ -126,6 +136,24 @@ type KanjiFeature struct {
 	Character Character
 	Order     Features
 	Length    Features
+}
+
+func (k KanjiFeature) GetOrderValue(p OrderFeatureIndexPosition, mask Features) (float64, error) {
+	if p < 0 || p >= OrderFeatureSize {
+		return 0.0, ErrOutRangeFeatureIndex
+	}
+
+	os, err := k.Order.Multiple(mask)
+	if err != nil {
+		return 0.0, fmt.Errorf("failed order value: %w", err)
+	}
+
+	total := os.Sum()
+	if total == 0 {
+		return 0, nil
+	}
+
+	return os[p] / total, nil
 }
 
 func NewKanjiFeature(c Character, o, l []float64) (KanjiFeature, error) {

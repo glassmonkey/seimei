@@ -111,9 +111,9 @@ func TestKanjiFeatureOrderCalculator_Mask(t *testing.T) {
 			sut := feature.KanjiFeatureManager{
 				KanjiFeatureMap: map[feature.Character]feature.KanjiFeature{},
 			}
-			got, err := sut.Mask(tt.inputLength, tt.inputPosition)
+			got, err := sut.OrderMask(tt.inputLength, tt.inputPosition)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
+				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
 			}
 			if tt.wantErr != nil {
 				return
@@ -203,9 +203,9 @@ func TestKanjiFeatureOrderCalculator_SelectFeaturePosition(t *testing.T) {
 			sut := feature.KanjiFeatureManager{
 				KanjiFeatureMap: map[feature.Character]feature.KanjiFeature{},
 			}
-			got, err := sut.SelectFeaturePosition(tt.inputName, tt.inputPosition)
+			got, err := sut.SelectFeatureOrderPosition(tt.inputName, tt.inputPosition)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
+				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
 			}
 			if tt.wantErr != nil {
 				return
@@ -215,5 +215,117 @@ func TestKanjiFeatureOrderCalculator_SelectFeaturePosition(t *testing.T) {
 				t.Errorf("mask value mismatch (-got +want):\n%s", diff)
 			}
 		})
+	}
+}
+
+func TestKanjiFeature_GetOrderValue(t *testing.T) {
+	type testdata struct {
+		name          string
+		inputFeature  feature.Features
+		inputPosition feature.OrderFeatureIndexPosition
+		inputMask     feature.Features
+		wantScore     float64
+		wantErr       error
+	}
+
+	tests := []testdata{
+		{
+			name:          "mask is all 1",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32},
+			inputMask:     feature.Features{1, 1, 1, 1, 1, 1},
+			inputPosition: 0,
+			wantScore:     1.0 / 63,
+			wantErr:       nil,
+		},
+		{
+			name:          "mask is all 0",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32},
+			inputMask:     feature.Features{0, 0, 0, 0, 0, 0},
+			inputPosition: 0,
+			wantScore:     0,
+			wantErr:       nil,
+		},
+		{
+			name:          "mask is half 1",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32},
+			inputMask:     feature.Features{1, 0, 1, 0, 1, 0},
+			inputPosition: 0,
+			wantScore:     1.0 / (1 + 4 + 16),
+			wantErr:       nil,
+		},
+		{
+			name:          "mask is half 1 and target index 1",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32},
+			inputMask:     feature.Features{1, 0, 1, 0, 1, 0},
+			inputPosition: 1,
+			wantScore:     0,
+			wantErr:       nil,
+		},
+		{
+			name:          "mask is half 1 and target index 2",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32},
+			inputMask:     feature.Features{1, 0, 1, 0, 1, 0},
+			inputPosition: 2,
+			wantScore:     4.0 / (1 + 4 + 16),
+			wantErr:       nil,
+		},
+		{
+			name:          "target index -1",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32},
+			inputMask:     feature.Features{1, 0, 1, 0, 1, 0},
+			inputPosition: -1,
+			wantScore:     0,
+			wantErr:       feature.ErrOutRangeFeatureIndex,
+		},
+		{
+			name:          "target index 6",
+			inputFeature:  feature.Features{1, 2, 4, 8, 16, 32},
+			inputMask:     feature.Features{1, 0, 1, 0, 1, 0},
+			inputPosition: 6,
+			wantScore:     0,
+			wantErr:       feature.ErrOutRangeFeatureIndex,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			sut := featureFixtures(inputForFixtures{
+				orders: tt.inputFeature,
+			})
+			got, err := sut.GetOrderValue(tt.inputPosition, tt.inputMask)
+			if !errors.Is(err, tt.wantErr) {
+				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
+			}
+			if tt.wantErr != nil {
+				return
+			}
+
+			if diff := cmp.Diff(got, tt.wantScore); diff != "" {
+				t.Errorf("score value mismatch (-got +want):\n%s", diff)
+			}
+		})
+	}
+}
+
+type inputForFixtures struct {
+	orders []float64
+	length []float64
+}
+
+func featureFixtures(input inputForFixtures) feature.KanjiFeature {
+	o := input.orders
+	l := input.length
+	if len(o) == 0 {
+		o = []float64{1, 1, 1, 1, 1, 1}
+	}
+	if len(l) == 0 {
+		l = []float64{1, 1, 1, 1, 1, 1, 1, 1}
+	}
+	return feature.KanjiFeature{
+		Character: "dummy",
+		Order:     o,
+		Length:    l,
 	}
 }

@@ -21,7 +21,6 @@ func TestRun(t *testing.T) {
 		inputName   string
 		inputParser string
 		want        string
-		skip        bool
 	}
 
 	tests := []testdata{
@@ -30,35 +29,30 @@ func TestRun(t *testing.T) {
 			inputName:   "田中太郎",
 			inputParser: " ",
 			want:        "田中 太郎",
-			skip:        false,
 		},
 		{
 			name:        "分割文字列が反映される",
 			inputName:   "田中太郎",
 			inputParser: "/",
 			want:        "田中/太郎",
-			skip:        false,
 		},
 		{
 			name:        "ルールベースで動作する",
 			inputName:   "乙一",
 			inputParser: " ",
 			want:        "乙 一",
-			skip:        false,
 		},
 		{
-			name:        "統計量ベースで動作する(仮実装)",
+			name:        "統計量ベースで動作する",
 			inputName:   "竈門炭治郎",
 			inputParser: " ",
 			want:        "竈門 炭治郎",
-			skip:        false,
 		},
 		{
-			name:        "統計量ベースで動作しない(仮実装)",
+			name:        "統計量ベースで分割できる",
 			inputName:   "中曽根康弘",
 			inputParser: " ",
 			want:        "中曽根 康弘",
-			skip:        true,
 		},
 	}
 	//nolint:paralleltest
@@ -66,9 +60,6 @@ func TestRun(t *testing.T) {
 		tt := tt
 
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.skip {
-				t.Skip()
-			}
 			got := extractStdout(t, func() error {
 				if err := seimei.Run(tt.inputName, tt.inputParser); err != nil {
 					return fmt.Errorf("happen error: %w", err)

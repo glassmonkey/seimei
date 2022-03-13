@@ -6,7 +6,7 @@
 
 **seimei** is a Go port of a tool ([namedivider-python](https://github.com/rskmoi/namedivider-python)) created in python to split Japanese first and last names.  
 
-For implementation details, please check ([namedivider-python](https://github.com/rskmoi/namedivider-python)) from which you are porting.
+For implementation details, please check ([namedivider-python](https://github.com/rskmoi/namedivider-python)) from which porting.
 
 
 # Installation

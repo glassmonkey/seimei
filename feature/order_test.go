@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/glassmonkey/seimei"
-
 	"github.com/glassmonkey/seimei/feature"
 	"github.com/glassmonkey/seimei/parser"
 	"github.com/google/go-cmp/cmp"
@@ -75,6 +74,7 @@ func TestKanjiOrderFeatureCalculator_ScoreWithStub(t *testing.T) {
 	}
 }
 
+//nolint:dupl
 func TestKanjiOrderFeatureCalculator_ScoreWithCSVData(t *testing.T) {
 	t.Parallel()
 

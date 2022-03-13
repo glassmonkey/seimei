@@ -191,10 +191,12 @@ func (f Features) SoftMax() Features {
 	for i, v := range f {
 		e[i] = math.Exp(v)
 	}
+
 	u := e.Sum()
 	for i, v := range e {
 		e[i] = v / u
 	}
+
 	return e
 }
 

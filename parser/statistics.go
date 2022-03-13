@@ -41,6 +41,7 @@ func (s StatisticsParser) Parse(fullname FullName, separator Separator) (Divided
 		if err != nil {
 			return DividedName{}, fmt.Errorf("parse error: %w", err)
 		}
+
 		features = append(features, cs)
 
 		if cs > ms {

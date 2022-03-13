@@ -76,6 +76,17 @@ func TestNameParser_Parse(t *testing.T) {
 				Algorithm: parser.Rule,
 			},
 		},
+		{
+			name:  "やまだはなこ",
+			input: "やまだはなこ",
+			want: parser.DividedName{
+				LastName:  "や",
+				FirstName: "まだはなこ",
+				Separator: separator,
+				Score:     0.16666666666666666,
+				Algorithm: parser.Statistics,
+			},
+		},
 	}
 
 	for _, tt := range tests {

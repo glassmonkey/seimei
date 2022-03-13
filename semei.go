@@ -4,6 +4,7 @@ import (
 	// Using embed.
 	_ "embed"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -26,8 +27,7 @@ func InitKanjiFeatureManager() feature.KanjiFeatureManager {
 
 	for i := 0; ; i++ {
 		record, err := r.Read()
-		//nolint:errorlint
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 

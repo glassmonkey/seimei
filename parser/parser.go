@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"unicode/utf8"
+
+	"github.com/glassmonkey/seimei/feature"
 )
 
 type Algorithm string
@@ -84,10 +86,10 @@ type NameParser struct {
 	Separator Separator
 }
 
-func NewNameParser(separatorString Separator) NameParser {
+func NewNameParser(separatorString Separator, m feature.KanjiFeatureManager) NameParser {
 	s := make([]Parser, 0)
 	s = append(s, NewRuleBaseParser())
-	s = append(s, NewStatisticsParser())
+	s = append(s, NewStatisticsParser(m))
 
 	return NameParser{
 		Parsers:   s,

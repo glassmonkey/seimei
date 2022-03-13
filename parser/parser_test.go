@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/glassmonkey/seimei/feature"
 	"github.com/glassmonkey/seimei/parser"
 	"github.com/google/go-cmp/cmp"
 )
@@ -65,7 +66,7 @@ func TestNameParser_Parse(t *testing.T) {
 			if tt.skip {
 				t.Skip()
 			}
-			sut := parser.NewNameParser(separator)
+			sut := parser.NewNameParser(separator, feature.KanjiFeatureManager{})
 			got, err := sut.Parse(tt.input)
 			if err != nil {
 				t.Errorf("error is not nil, err=%v", err)
@@ -81,7 +82,7 @@ func TestNameParser_Parse(t *testing.T) {
 func TestNameParser_Parse_Validate(t *testing.T) {
 	t.Parallel()
 
-	sut := parser.NewNameParser("/")
+	sut := parser.NewNameParser("/", feature.KanjiFeatureManager{})
 	_, gotErr := sut.Parse("あ")
 	wantErr := parser.ErrNameLength
 

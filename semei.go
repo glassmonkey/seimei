@@ -16,8 +16,8 @@ import (
 //go:embed namedivider-python/assets/kanji.csv
 var assets string
 
-func InitNameParser(parseString string) (parser.NameParser, error) {
-	return parser.NewNameParser(parser.Separator(parseString)), nil
+func InitNameParser(parseString string, manager feature.KanjiFeatureManager) parser.NameParser {
+	return parser.NewNameParser(parser.Separator(parseString), manager)
 }
 
 func InitKanjiFeatureManager() feature.KanjiFeatureManager {
@@ -77,10 +77,8 @@ func InitKanjiFeatureManager() feature.KanjiFeatureManager {
 }
 
 func Run(fullname string, parseString string) error {
-	p, err := InitNameParser(parseString)
-	if err != nil {
-		return err
-	}
+	m := InitKanjiFeatureManager()
+	p := InitNameParser(parseString, m)
 
 	name, err := p.Parse(parser.FullName(fullname))
 	if err != nil {

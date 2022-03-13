@@ -3,6 +3,8 @@ package parser_test
 import (
 	"testing"
 
+	"github.com/glassmonkey/seimei"
+	"github.com/glassmonkey/seimei/feature"
 	"github.com/glassmonkey/seimei/parser"
 	"github.com/google/go-cmp/cmp"
 )
@@ -26,7 +28,7 @@ func TestStatisticsParser_Parse(t *testing.T) {
 				LastName:  "菅",
 				FirstName: "義偉",
 				Separator: separator,
-				Score:     0.1111111111111111, // patch work score, todo fix.
+				Score:     0.3703703703703704,
 				Algorithm: parser.Statistics,
 			},
 			skip: false,
@@ -38,7 +40,7 @@ func TestStatisticsParser_Parse(t *testing.T) {
 				LastName:  "阿部",
 				FirstName: "晋三",
 				Separator: separator,
-				Score:     1, // patch work score, todo fix.
+				Score:     0.995819397993311,
 				Algorithm: parser.Statistics,
 			},
 			skip: false,
@@ -65,7 +67,9 @@ func TestStatisticsParser_Parse(t *testing.T) {
 				t.Skip()
 			}
 			sut := parser.StatisticsParser{
-				Calculator: DummyKanjiFeatureCalculator{},
+				OrderCalculator: feature.KanjiFeatureOrderCalculator{
+					Manager: seimei.InitKanjiFeatureManager(),
+				},
 			}
 			got, err := sut.Parse(tt.input, separator)
 			if err != nil {
@@ -77,15 +81,4 @@ func TestStatisticsParser_Parse(t *testing.T) {
 			}
 		})
 	}
-}
-
-type DummyKanjiFeatureCalculator struct{}
-
-func (s DummyKanjiFeatureCalculator) Score(lastName parser.LastName, firstName parser.FirstName) float64 {
-	v := float64(len(lastName) - len(firstName))
-	if v == 0 {
-		return 1
-	}
-
-	return 1 / (v * v)
 }

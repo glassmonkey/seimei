@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/glassmonkey/seimei"
 	"github.com/glassmonkey/seimei/feature"
 	"github.com/glassmonkey/seimei/parser"
 	"github.com/google/go-cmp/cmp"
@@ -16,7 +17,6 @@ func TestNameParser_Parse(t *testing.T) {
 		name  string
 		input parser.FullName
 		want  parser.DividedName
-		skip  bool
 	}
 
 	separator := parser.Separator("/")
@@ -31,7 +31,6 @@ func TestNameParser_Parse(t *testing.T) {
 				Score:     1,
 				Algorithm: parser.Rule,
 			},
-			skip: false,
 		},
 		{
 			name:  "フルネームが漢字の場合",
@@ -40,10 +39,9 @@ func TestNameParser_Parse(t *testing.T) {
 				LastName:  "田中",
 				FirstName: "太郎",
 				Separator: "/",
-				Score:     1, // patch work score, todo fix.
+				Score:     0.6135106593624183,
 				Algorithm: parser.Statistics,
 			},
-			skip: true,
 		},
 		{
 			name:  "フルネームが漢字の場合",
@@ -52,10 +50,9 @@ func TestNameParser_Parse(t *testing.T) {
 				LastName:  "竈門",
 				FirstName: "炭治郎",
 				Separator: "/",
-				Score:     0.1111111111111111, // patch work score, todo fix.
+				Score:     0.2854269661370256,
 				Algorithm: parser.Statistics,
 			},
-			skip: true,
 		},
 	}
 
@@ -63,11 +60,7 @@ func TestNameParser_Parse(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			if tt.skip {
-				t.Skip()
-			}
-			//nolint:exhaustivestruct
-			sut := parser.NewNameParser(separator, feature.KanjiFeatureManager{})
+			sut := parser.NewNameParser(separator, seimei.InitKanjiFeatureManager())
 			got, err := sut.Parse(tt.input)
 			if err != nil {
 				t.Errorf("error is not nil, err=%v", err)

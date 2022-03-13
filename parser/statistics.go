@@ -15,11 +15,15 @@ func NewStatisticsParser(m feature.KanjiFeatureManager) StatisticsParser {
 		OrderCalculator: feature.KanjiOrderFeatureCalculator{
 			Manager: m,
 		},
+		LengthCalculator: feature.KanjiLengthFeatureCalculator{
+			Manager: m,
+		},
 	}
 }
 
 type StatisticsParser struct {
-	OrderCalculator feature.KanjiOrderFeatureCalculator
+	OrderCalculator  feature.KanjiOrderFeatureCalculator
+	LengthCalculator feature.KanjiLengthFeatureCalculator
 }
 
 func (s StatisticsParser) Parse(fullname FullName, separator Separator) (DividedName, error) {
@@ -65,12 +69,12 @@ func (s StatisticsParser) score(lastName LastName, firstName FirstName) (float64
 
 	ols, err := s.OrderCalculator.Score(lastName, fullname.Length())
 	if err != nil {
-		return 0, fmt.Errorf("failed Score: %w", err)
+		return 0, fmt.Errorf("failed Order Score: %w", err)
 	}
 
 	ofs, err := s.OrderCalculator.Score(firstName, fullname.Length())
 	if err != nil {
-		return 0, fmt.Errorf("failed Score: %w", err)
+		return 0, fmt.Errorf("failed Order Score: %w", err)
 	}
 
 	os := (ols + ofs) / (float64(fullname.Length()) - minNameLength)
@@ -79,19 +83,17 @@ func (s StatisticsParser) score(lastName LastName, firstName FirstName) (float64
 		return os, nil
 	}
 
-	lls := s.lengthScore(string(lastName), fullname.Length(), 0)
-	lfs := s.lengthScore(string(firstName), fullname.Length(), lastName.Length())
-	ls := (lls + lfs) / float64(fullname.Length())
-
-	return ls, nil
-}
-
-// lengthScore: patch work implementation.
-func (s StatisticsParser) lengthScore(name string, fullNameLength, _ int) float64 {
-	v := float64(len(name) - fullNameLength)
-	if v == 0 {
-		return 1
+	lls, err := s.LengthCalculator.Score(lastName, fullname.Length())
+	if err != nil {
+		return 0, fmt.Errorf("failed Length Score: %w", err)
 	}
 
-	return 1 / (v * v)
+	lfs, err := s.LengthCalculator.Score(firstName, fullname.Length())
+	if err != nil {
+		return 0, fmt.Errorf("failed Length Score: %w", err)
+	}
+
+	ls := (lls + lfs) / float64(fullname.Length())
+
+	return (os + ls) / 2, nil
 }

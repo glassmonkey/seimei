@@ -25,10 +25,14 @@ var (
 
 type OrderFeatureIndexPosition int
 
-type LengthFeatureIndexPosition int
-
 func (i OrderFeatureIndexPosition) MoveFirstNameIndex() OrderFeatureIndexPosition {
 	return i + OrderFeatureSize/2
+}
+
+type LengthFeatureIndexPosition int
+
+func (i LengthFeatureIndexPosition) MoveFirstNameIndex() LengthFeatureIndexPosition {
+	return i + LengthFeatureSize/2
 }
 
 type Character string
@@ -127,6 +131,17 @@ func (m KanjiFeatureManager) SelectOrderFeaturePosition(pieceOfName PartOfNameCh
 	}
 
 	return OrderEndFeatureIndex.MoveFirstNameIndex(), nil
+}
+
+func (m KanjiFeatureManager) SelectLengthFeaturePosition(pieceOfName PartOfNameCharacters) (LengthFeatureIndexPosition, error) {
+	p := pieceOfName.Length()
+	if p > LengthFeatureSize/2 {
+		p = LengthFeatureSize / 2
+	}
+	if pieceOfName.IsLastName() {
+		return LengthFeatureIndexPosition(p - 1), nil
+	}
+	return LengthFeatureIndexPosition(p - 1).MoveFirstNameIndex(), nil
 }
 
 func DefaultKanjiFeature() KanjiFeature {

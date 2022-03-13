@@ -341,7 +341,68 @@ func TestKanjiOrderFeatureCalculator_SelectOrderFeaturePosition(t *testing.T) {
 	}
 }
 
+func TestKanjiOrderFeatureCalculator_SelectLengthFeaturePosition(t *testing.T) {
+	t.Parallel()
+
+	type testdata struct {
+		name         string
+		inputName    feature.PartOfNameCharacters
+		wantPosition feature.LengthFeatureIndexPosition
+		wantErr      error
+	}
+
+	tests := []testdata{
+		{
+			name:         "名前指定",
+			inputName:    parser.FirstName("あきら"),
+			wantPosition: feature.LengthFeatureIndexPosition(6),
+			wantErr:      nil,
+		},
+		{
+			name:         "名字指定",
+			inputName:    parser.LastName("中山田"),
+			wantPosition: feature.LengthFeatureIndexPosition(2),
+			wantErr:      nil,
+		},
+		{
+			name:         "指定文字数が大きい場合の名字",
+			inputName:    parser.LastName("寿限無寿限"),
+			wantPosition: feature.LengthFeatureIndexPosition(3),
+			wantErr:      nil,
+		},
+		{
+			name:         "指定文字数が大きい場合の指名",
+			inputName:    parser.FirstName("寿限無寿限"),
+			wantPosition: feature.LengthFeatureIndexPosition(7),
+			wantErr:      nil,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			sut := feature.KanjiFeatureManager{
+				KanjiFeatureMap: map[feature.Character]feature.KanjiFeature{},
+			}
+			got, err := sut.SelectLengthFeaturePosition(tt.inputName)
+			if !errors.Is(err, tt.wantErr) {
+				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
+			}
+			if tt.wantErr != nil {
+				return
+			}
+
+			if diff := cmp.Diff(got, tt.wantPosition); diff != "" {
+				t.Errorf("mask value mismatch (-got +want):\n%s", diff)
+			}
+		})
+	}
+}
+
 func TestKanjiFeature_GetOrderValue(t *testing.T) {
+	t.Parallel()
+
 	type testdata struct {
 		name          string
 		inputFeature  feature.Features
@@ -422,6 +483,7 @@ func TestKanjiFeature_GetOrderValue(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+			//nolint:exhaustivestruct
 			sut := featureFixtures(inputForFixtures{
 				orders: tt.inputFeature,
 			})
@@ -448,9 +510,11 @@ type inputForFixtures struct {
 func featureFixtures(input inputForFixtures) feature.KanjiFeature {
 	o := input.orders
 	l := input.length
+
 	if len(o) == 0 {
 		o = []float64{1, 1, 1, 1, 1, 1}
 	}
+
 	if len(l) == 0 {
 		l = []float64{1, 1, 1, 1, 1, 1, 1, 1}
 	}

@@ -10,11 +10,14 @@ const (
 	LengthFeatureSize    = 8
 )
 
-var ErrOrderFeatureInvalidSize = errors.New("order feature's length must be 6")
-
-var ErrLengthFeatureInvalidSize = errors.New("length feature's length must be 8")
-
-var ErrInvalidFeatureSize = errors.New("feature-to-feature calculations must be the same size")
+var (
+	ErrOrderFeatureInvalidSize  = errors.New("order feature's length must be 6")
+	ErrLengthFeatureInvalidSize = errors.New("length feature's length must be 8")
+	ErrInvalidFeatureSize       = errors.New("feature-to-feature calculations must be the same size")
+	ErrOutRangeOrderMask        = errors.New("character position is out of range when creating mask")
+	ErrInvalidOrderMask         = errors.New("first character and last character must not be created order mask")
+	ErrOutRangeFeatureIndex     = errors.New("character position is out of range when selecting features")
+)
 
 type Character string
 
@@ -29,6 +32,58 @@ func (m KanjiFeatureManager) Get(c Character) KanjiFeature {
 	}
 
 	return v
+}
+
+func (m KanjiFeatureManager) Mask(fullNameLength, charPosition int) (Features, error) {
+	if charPosition == 0 || charPosition == fullNameLength-1 {
+		return Features{}, ErrInvalidOrderMask
+	}
+
+	if charPosition < 0 || charPosition >= fullNameLength {
+		return Features{}, ErrOutRangeOrderMask
+	}
+	//nolint:gomnd
+	if fullNameLength == 3 {
+		return Features{0, 0, 1, 1, 0, 0}, nil
+	}
+
+	if charPosition == 1 {
+		return Features{0, 1, 1, 1, 0, 0}, nil
+	}
+
+	if charPosition == fullNameLength-2 {
+		return Features{0, 0, 1, 1, 1, 0}, nil
+	}
+
+	return Features{0, 1, 1, 1, 1, 0}, nil
+}
+
+func (m KanjiFeatureManager) SelectFeaturePosition(pieceOfName PartOfNameCharacters, positionInPieceOfName int) (OrderFeatureIndexPosition, error) {
+	if positionInPieceOfName < 0 || positionInPieceOfName >= pieceOfName.Length() {
+		return 0, ErrOutRangeFeatureIndex
+	}
+
+	if positionInPieceOfName == 0 {
+		if pieceOfName.IsLastName() {
+			return OrderFirstFeatureIndex, nil
+		}
+
+		return OrderFirstFeatureIndex.MoveFirstNameIndex(), nil
+	}
+
+	if positionInPieceOfName != pieceOfName.Length()-1 {
+		if pieceOfName.IsLastName() {
+			return OrderMiddleFeatureIndex, nil
+		}
+
+		return OrderMiddleFeatureIndex.MoveFirstNameIndex(), nil
+	}
+
+	if pieceOfName.IsLastName() {
+		return OrderEndFeatureIndex, nil
+	}
+
+	return OrderEndFeatureIndex.MoveFirstNameIndex(), nil
 }
 
 func DefaultKanjiFeature() KanjiFeature {

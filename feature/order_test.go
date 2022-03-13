@@ -37,6 +37,13 @@ func TestKanjiOrderFeatureCalculator_ScoreWithStub(t *testing.T) {
 			wantErr:             nil,
 		},
 		{
+			name:                "設定ファイルがない名前の場合は0",
+			inputName:           parser.LastName("太郎"),
+			inputFullNameLength: 4,
+			wantScore:           0,
+			wantErr:             nil,
+		},
+		{
 			name:                "フルネームと同じサイズ指定の場合はスコアは0",
 			inputName:           parser.LastName("天ケ瀬"),
 			inputFullNameLength: 3,

@@ -28,7 +28,7 @@ type StatisticsParser struct {
 
 func (s StatisticsParser) Parse(fullname FullName, separator Separator) (DividedName, error) {
 	ms := 0.0
-	mi := 0
+	mi := 1
 	features := feature.Features{}
 
 	for i := range fullname.Slice() {

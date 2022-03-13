@@ -16,8 +16,9 @@ const (
 )
 
 var (
-	ErrNameLength    = errors.New("name length needs at least 2 chars")
-	ErrSplitPosition = errors.New("split position is invalid")
+	ErrNameLength       = errors.New("name length needs at least 2 chars")
+	ErrSplitPosition    = errors.New("split position is invalid")
+	ErrParserNotWorking = errors.New("the name has an unexpected string, so the division failed")
 )
 
 type Parser interface {
@@ -113,13 +114,7 @@ func (n NameParser) Parse(fullname FullName) (DividedName, error) {
 		}
 	}
 
-	return DividedName{
-		FirstName: "太郎",
-		LastName:  "田中",
-		Separator: n.Separator,
-		Score:     0,
-		Algorithm: Dummy,
-	}, nil
+	return DividedName{}, ErrParserNotWorking
 }
 
 func (n NameParser) validate(fullname FullName) error {

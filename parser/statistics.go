@@ -29,6 +29,7 @@ type StatisticsParser struct {
 func (s StatisticsParser) Parse(fullname FullName, separator Separator) (DividedName, error) {
 	ms := 0.0
 	mi := 0
+	features := feature.Features{}
 
 	for i := range fullname.Slice() {
 		l, f, err := fullname.Split(i)
@@ -40,6 +41,7 @@ func (s StatisticsParser) Parse(fullname FullName, separator Separator) (Divided
 		if err != nil {
 			return DividedName{}, fmt.Errorf("parse error: %w", err)
 		}
+		features = append(features, cs)
 
 		if cs > ms {
 			ms = cs
@@ -56,7 +58,7 @@ func (s StatisticsParser) Parse(fullname FullName, separator Separator) (Divided
 		FirstName: f,
 		LastName:  l,
 		Separator: separator,
-		Score:     ms,
+		Score:     features.SoftMax()[mi],
 		Algorithm: Statistics,
 	}, nil
 }

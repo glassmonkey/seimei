@@ -16,9 +16,6 @@ func (fc KanjiLengthFeatureCalculator) Score(pieceOfName PartOfNameCharacters, f
 
 	for i, c := range pieceOfName.Slice() {
 		ci := i + offset
-		if ci == 0 || ci == fullNameLength-1 {
-			continue
-		}
 
 		mask, err := fc.Manager.LengthMask(fullNameLength, ci)
 		if err != nil {

@@ -4,19 +4,21 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/glassmonkey/seimei"
+
 	"github.com/glassmonkey/seimei/feature"
 	"github.com/glassmonkey/seimei/parser"
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestKanjiLengthFeatureCalculator_Score(t *testing.T) {
+func TestKanjiLengthFeatureCalculator_ScoreWithStub(t *testing.T) {
 	t.Parallel()
 
 	type testdata struct {
 		name                string
 		inputName           feature.PartOfNameCharacters
 		inputFullNameLength int
-		wantSrore           float64
+		wantScore           float64
 		wantErr             error
 	}
 
@@ -25,28 +27,28 @@ func TestKanjiLengthFeatureCalculator_Score(t *testing.T) {
 			name:                "名字",
 			inputName:           parser.FirstName("冬馬"),
 			inputFullNameLength: 5,
-			wantSrore:           1.0 / 4,
+			wantScore:           0.5,
 			wantErr:             nil,
 		},
 		{
 			name:                "名前",
 			inputName:           parser.LastName("天ケ瀬"),
 			inputFullNameLength: 5,
-			wantSrore:           1.0 / 2,
+			wantScore:           0.75,
 			wantErr:             nil,
 		},
 		{
 			name:                "フルネームと同じサイズ指定の場合はスコアは0",
 			inputName:           parser.LastName("天ケ瀬"),
 			inputFullNameLength: 3,
-			wantSrore:           0,
+			wantScore:           0,
 			wantErr:             nil,
 		},
 		{
 			name:                "指定文字列がフルネームより大きい場合はマスクデータの作成でエラーになる",
 			inputName:           parser.LastName("天ケ瀬"),
 			inputFullNameLength: 2,
-			wantSrore:           0,
+			wantScore:           0,
 			wantErr:             feature.ErrOutRangeOrderMask,
 		},
 	}
@@ -66,7 +68,71 @@ func TestKanjiLengthFeatureCalculator_Score(t *testing.T) {
 				return
 			}
 
-			if diff := cmp.Diff(got, tt.wantSrore); diff != "" {
+			if diff := cmp.Diff(got, tt.wantScore); diff != "" {
+				t.Errorf("score value mismatch (-got +want):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestKanjiLengthFeatureCalculator_ScoreWithCSVData(t *testing.T) {
+	t.Parallel()
+
+	type testdata struct {
+		name                string
+		inputName           feature.PartOfNameCharacters
+		inputFullNameLength int
+		wantScore           float64
+		wantErr             error
+	}
+
+	tests := []testdata{
+		{
+			name:                "新海誠(名前)",
+			inputName:           parser.FirstName("誠"),
+			inputFullNameLength: 3,
+			wantScore:           0.5414201183431953,
+			wantErr:             nil,
+		},
+		{
+			name:                "新海誠(名字)",
+			inputName:           parser.LastName("新海"),
+			inputFullNameLength: 3,
+			wantScore:           1.6721919841662545,
+			wantErr:             nil,
+		},
+		{
+			name:                "清武弘嗣(名前)",
+			inputName:           parser.FirstName("弘嗣"),
+			inputFullNameLength: 4,
+			wantScore:           1.982873228774868,
+			wantErr:             nil,
+		},
+		{
+			name:                "清武弘嗣(名字)",
+			inputName:           parser.LastName("清武"),
+			inputFullNameLength: 4,
+			wantScore:           1.9431977559607292,
+			wantErr:             nil,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			sut := feature.KanjiLengthFeatureCalculator{
+				Manager: seimei.InitKanjiFeatureManager(),
+			}
+			got, err := sut.Score(tt.inputName, tt.inputFullNameLength)
+			if !errors.Is(err, tt.wantErr) {
+				t.Fatalf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
+			}
+			if tt.wantErr != nil {
+				return
+			}
+
+			if diff := cmp.Diff(got, tt.wantScore); diff != "" {
 				t.Errorf("score value mismatch (-got +want):\n%s", diff)
 			}
 		})

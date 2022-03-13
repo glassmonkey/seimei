@@ -3,6 +3,8 @@ package parser_test
 import (
 	"testing"
 
+	"github.com/glassmonkey/seimei"
+	"github.com/glassmonkey/seimei/feature"
 	"github.com/glassmonkey/seimei/parser"
 	"github.com/google/go-cmp/cmp"
 )
@@ -26,7 +28,7 @@ func TestStatisticsParser_Parse(t *testing.T) {
 				LastName:  "菅",
 				FirstName: "義偉",
 				Separator: separator,
-				Score:     0.1111111111111111, // patch work score, todo fix.
+				Score:     0.3703703703703704,
 				Algorithm: parser.Statistics,
 			},
 			skip: false,
@@ -38,7 +40,7 @@ func TestStatisticsParser_Parse(t *testing.T) {
 				LastName:  "阿部",
 				FirstName: "晋三",
 				Separator: separator,
-				Score:     1, // patch work score, todo fix.
+				Score:     0.995819397993311,
 				Algorithm: parser.Statistics,
 			},
 			skip: false,
@@ -64,7 +66,11 @@ func TestStatisticsParser_Parse(t *testing.T) {
 			if tt.skip {
 				t.Skip()
 			}
-			sut := parser.NewStatisticsParser()
+			sut := parser.StatisticsParser{
+				OrderCalculator: feature.KanjiFeatureOrderCalculator{
+					Manager: seimei.InitKanjiFeatureManager(),
+				},
+			}
 			got, err := sut.Parse(tt.input, separator)
 			if err != nil {
 				t.Errorf("error is not nil, err=%v", err)

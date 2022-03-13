@@ -4,6 +4,7 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/glassmonkey/seimei/feature"
 	"github.com/glassmonkey/seimei/parser"
 	"github.com/google/go-cmp/cmp"
 )
@@ -42,7 +43,7 @@ func TestNameParser_Parse(t *testing.T) {
 				Score:     1, // patch work score, todo fix.
 				Algorithm: parser.Statistics,
 			},
-			skip: false,
+			skip: true,
 		},
 		{
 			name:  "フルネームが漢字の場合",
@@ -54,7 +55,7 @@ func TestNameParser_Parse(t *testing.T) {
 				Score:     0.1111111111111111, // patch work score, todo fix.
 				Algorithm: parser.Statistics,
 			},
-			skip: false,
+			skip: true,
 		},
 	}
 
@@ -65,7 +66,8 @@ func TestNameParser_Parse(t *testing.T) {
 			if tt.skip {
 				t.Skip()
 			}
-			sut := parser.NewNameParser(separator)
+			//nolint:exhaustivestruct
+			sut := parser.NewNameParser(separator, feature.KanjiFeatureManager{})
 			got, err := sut.Parse(tt.input)
 			if err != nil {
 				t.Errorf("error is not nil, err=%v", err)
@@ -80,8 +82,8 @@ func TestNameParser_Parse(t *testing.T) {
 
 func TestNameParser_Parse_Validate(t *testing.T) {
 	t.Parallel()
-
-	sut := parser.NewNameParser("/")
+	//nolint:exhaustivestruct
+	sut := parser.NewNameParser("/", feature.KanjiFeatureManager{})
 	_, gotErr := sut.Parse("あ")
 	wantErr := parser.ErrNameLength
 
@@ -190,11 +192,21 @@ func TestFullName_Sprint(t *testing.T) {
 			if !errors.Is(err, tt.wantErr) {
 				t.Errorf("error is not expected, got error=(%v), want error=(%v)", err, tt.wantErr)
 			}
+			if tt.wantErr != nil {
+				return
+			}
 			if l != tt.wantLastName {
 				t.Errorf("LastName is not expected, got=(%s), want=(%s)", l, tt.wantLastName)
 			}
 			if f != tt.wantFirstName {
 				t.Errorf("LastName is not expected, got=(%s), want=(%s)", f, tt.wantFirstName)
+			}
+			got := parser.JoinName(l, f)
+			if got != tt.input {
+				t.Errorf("fullname is not expected, got=(%s), want=(%s)", got, tt.input)
+			}
+			if f.Length()+l.Length() != tt.input.Length() {
+				t.Errorf("fullname's length is not expected, got(fist_name=(%s), last_name=(%s)), want(%s)", f, l, tt.input)
 			}
 		})
 	}

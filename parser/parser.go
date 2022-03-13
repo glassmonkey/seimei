@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"unicode/utf8"
+
+	"github.com/glassmonkey/seimei/feature"
 )
 
 type Algorithm string
@@ -25,7 +27,35 @@ type FullName string
 
 type FirstName string
 
+func (n FirstName) IsLastName() bool {
+	return false
+}
+
+func (n FirstName) Length() int {
+	return utf8.RuneCountInString(string(n))
+}
+
+func (n FirstName) Slice() []rune {
+	return []rune(n)
+}
+
 type LastName string
+
+func (n LastName) IsLastName() bool {
+	return true
+}
+
+func (n LastName) Slice() []rune {
+	return []rune(n)
+}
+
+func (n LastName) Length() int {
+	return utf8.RuneCountInString(string(n))
+}
+
+func JoinName(lastName LastName, firstName FirstName) FullName {
+	return FullName(string(lastName) + string(firstName))
+}
 
 func (f FullName) Length() int {
 	return utf8.RuneCountInString(string(f))
@@ -56,10 +86,10 @@ type NameParser struct {
 	Separator Separator
 }
 
-func NewNameParser(separatorString Separator) NameParser {
+func NewNameParser(separatorString Separator, m feature.KanjiFeatureManager) NameParser {
 	s := make([]Parser, 0)
 	s = append(s, NewRuleBaseParser())
-	s = append(s, NewStatisticsParser())
+	s = append(s, NewStatisticsParser(m))
 
 	return NameParser{
 		Parsers:   s,

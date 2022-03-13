@@ -1,16 +1,26 @@
 package parser
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/glassmonkey/seimei/feature"
+)
 
 const (
 	Statistics = Algorithm("statistics")
 )
 
-func NewStatisticsParser() StatisticsParser {
-	return StatisticsParser{}
+func NewStatisticsParser(m feature.KanjiFeatureManager) StatisticsParser {
+	return StatisticsParser{
+		OrderCalculator: feature.KanjiFeatureOrderCalculator{
+			Manager: m,
+		},
+	}
 }
 
-type StatisticsParser struct{}
+type StatisticsParser struct {
+	OrderCalculator feature.KanjiFeatureOrderCalculator
+}
 
 func (s StatisticsParser) Parse(fullname FullName, separator Separator) (DividedName, error) {
 	ms := 0.0
@@ -22,7 +32,10 @@ func (s StatisticsParser) Parse(fullname FullName, separator Separator) (Divided
 			return DividedName{}, fmt.Errorf("parse error: %w", err)
 		}
 
-		cs := s.score(l, f)
+		cs, err := s.score(l, f)
+		if err != nil {
+			return DividedName{}, fmt.Errorf("parse error: %w", err)
+		}
 
 		if cs > ms {
 			ms = cs
@@ -44,9 +57,38 @@ func (s StatisticsParser) Parse(fullname FullName, separator Separator) (Divided
 	}, nil
 }
 
-// stub implement.
-func (s StatisticsParser) score(lastName LastName, firstName FirstName) float64 {
-	v := float64(len(lastName) - len(firstName))
+const orderOnlyScoreLength = 4
+
+// Score referer: https://github.com/rskmoi/namedivider-python/blob/master/namedivider/name_divider.py#L206
+func (s StatisticsParser) score(lastName LastName, firstName FirstName) (float64, error) {
+	fullname := JoinName(lastName, firstName)
+
+	ols, err := s.OrderCalculator.Score(lastName, fullname.Length())
+	if err != nil {
+		return 0, fmt.Errorf("failed Score: %w", err)
+	}
+
+	ofs, err := s.OrderCalculator.Score(firstName, fullname.Length())
+	if err != nil {
+		return 0, fmt.Errorf("failed Score: %w", err)
+	}
+
+	os := (ols + ofs) / (float64(fullname.Length()) - minNameLength)
+	// https://github.com/rskmoi/namedivider-python/blob/d87a488d4696bc26d2f6444ed399d83a6a1911a7/namedivider/name_divider.py#L219
+	if fullname.Length() == orderOnlyScoreLength {
+		return os, nil
+	}
+
+	lls := s.lengthScore(string(lastName), fullname.Length(), 0)
+	lfs := s.lengthScore(string(firstName), fullname.Length(), lastName.Length())
+	ls := (lls + lfs) / float64(fullname.Length())
+
+	return ls, nil
+}
+
+// lengthScore: patch work implementation.
+func (s StatisticsParser) lengthScore(name string, fullNameLength, _ int) float64 {
+	v := float64(len(name) - fullNameLength)
 	if v == 0 {
 		return 1
 	}

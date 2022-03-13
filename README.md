@@ -4,8 +4,7 @@
 [![test](https://github.com/glassmonkey/seimei/workflows/test/badge.svg)](https://github.com/glassmonkey/seimei/actions?query=workflow%3Atest)
 [![reviewdog](https://github.com/glassmonkey/seimei/workflows/reviewdog/badge.svg)](https://github.com/glassmonkey/seimei/actions?query=workflow%3Areviewdog)
 
-**seimei** is a tool for dividing the Japanese full name into a last name and a fist name in Python to Go.
-SEIMEI is a Go port of a tool ([namedivider-python](https://github.com/rskmoi/namedivider-python)) created in python to split Japanese first and last names.  
+**seimei** is a Go port of a tool ([namedivider-python](https://github.com/rskmoi/namedivider-python)) created in python to split Japanese first and last names.  
 
 For implementation details, please check ([namedivider-python](https://github.com/rskmoi/namedivider-python)) from which you are porting.
 

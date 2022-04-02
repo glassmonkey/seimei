@@ -1,7 +1,10 @@
 .PHONY: build
 
+Version=dev
+Revision=$(shell git rev-parse --short HEAD)
+
 build:
-	go build -o dist/seimei cmd/seimei/main.go
+	go build -o dist/seimei -ldflags "-X main.Version=$(Version) -X main.Revision=$(Revision)"  cmd/seimei/main.go
 
 .PHONY: test
 test:

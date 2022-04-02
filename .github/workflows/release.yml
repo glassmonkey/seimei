@@ -20,9 +20,9 @@ jobs:
           fetch-depth: 0
       - name: push-tag
         run: |
-          git tag push ${{ inputs.version }}
-          git push origin ${{ inputs.version }}
-        if: ${{ inputs.version }} != ''
+          git tag ${{ github.event.inputs.version }}
+          git push origin ${{ github.event.inputs.version }}
+        if: ${{ github.event.inputs.version }} != ''
       - name: Set up Go
         uses: actions/setup-go@v3
         with:

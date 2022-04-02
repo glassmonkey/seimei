@@ -20,3 +20,4 @@ linters:
     - funlen
     - lll
     - gomnd
+    - gochecknoglobals

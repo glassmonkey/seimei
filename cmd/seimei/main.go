@@ -20,8 +20,8 @@ func main() {
 		_, err := fmt.Fprintf(flag.CommandLine.Output(), "Usage of seimei(%s-%s):\n", Version, Revision)
 		if err != nil {
 			panic(err)
-			return
 		}
+
 		flag.PrintDefaults()
 	}
 	flag.Parse()

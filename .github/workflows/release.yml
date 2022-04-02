@@ -4,10 +4,21 @@ on:
   push:
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to bump to'
+        required: false
+        default: ''
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
+      - name: push-tag
+        run: |
+          git tag push ${{ inputs.version }}
+          git push origin ${{ inputs.version }}
+        if: ${{ inputs.version }} != ''
       - name: Checkout
         uses: actions/checkout@v3
         with:

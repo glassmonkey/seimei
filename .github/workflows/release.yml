@@ -14,15 +14,15 @@ jobs:
   goreleaser:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: push-tag
         run: |
           git tag push ${{ inputs.version }}
           git push origin ${{ inputs.version }}
         if: ${{ inputs.version }} != ''
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
       - name: Set up Go
         uses: actions/setup-go@v3
         with:

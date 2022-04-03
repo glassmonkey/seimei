@@ -74,16 +74,19 @@ func InitKanjiFeatureManager() feature.KanjiFeatureManager {
 	}
 }
 
-func Run(fullname string, parseString string) error {
+func Run(out io.Writer, fullname string, parseString string) error {
 	m := InitKanjiFeatureManager()
 	p := InitNameParser(parseString, m)
 
 	name, err := p.Parse(parser.FullName(fullname))
 	if err != nil {
-		return fmt.Errorf("happen error: %w", err)
+		return fmt.Errorf("happen error parse: %w", err)
 	}
 
-	fmt.Printf("%s\n", name.String())
+	_, err = fmt.Fprintf(out, "%s\n", name.String())
+	if err != nil {
+		return fmt.Errorf("happen error write stdout: %w", err)
+	}
 
 	return nil
 }

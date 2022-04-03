@@ -26,7 +26,7 @@ func main() {
 	}
 	flag.Parse()
 
-	if err := seimei.Run(*name, *parse); err != nil {
+	if err := seimei.Run(os.Stdout, *name, *parse); err != nil {
 		fmt.Printf("raised error: %s\n", err)
 		os.Exit(1)
 	}

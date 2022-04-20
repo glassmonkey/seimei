@@ -8,7 +8,7 @@ build:
 
 .PHONY: test
 test:
-	go test -v ./...
+	go test -v $(go list ./... | grep -v /benchmark/)
 
 .PHONY: test-coverage
 test-coverage:

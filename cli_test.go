@@ -47,6 +47,11 @@ func TestSetFlagForName(t *testing.T) {
 			input:      []string{"--name", "田中太郎", "-x"},
 			wantErrMsg: "name command parse error: flag provided but not defined: -x",
 		},
+		{
+			name:       "空",
+			input:      []string{},
+			wantErrMsg: "-name must be required (ex. 田中太郎)",
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -114,6 +119,11 @@ func TestSetFlagForFile(t *testing.T) {
 			input:      []string{"--file", "/tmb/hoge.csv", "-x"},
 			wantErrMsg: "file command parse error: flag provided but not defined: -x",
 		},
+		{
+			name:       "空",
+			input:      []string{},
+			wantErrMsg: "-path must be required (ex. /tmp/hoge.csv)",
+		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -159,6 +169,11 @@ func TestRun(t *testing.T) {
 			want:  "田中 太郎\n",
 		},
 		{
+			name:  "名前指定実行のヘルプ",
+			input: []string{"seimei", "name", "-h"},
+			want:  ``,
+		},
+		{
 			name:  "ファイル経由の実行",
 			input: []string{"seimei", "file", "-file", "testdata/success.csv"},
 			want: `田中 太郎
@@ -166,6 +181,11 @@ func TestRun(t *testing.T) {
 竈門 炭治郎
 中曽根 康弘
 `,
+		},
+		{
+			name:  "ファイル経由の実行のヘルプ",
+			input: []string{"seimei", "file", "-h"},
+			want:  ``,
 		},
 	}
 

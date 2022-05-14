@@ -14,10 +14,16 @@ import (
 	"github.com/glassmonkey/seimei/parser"
 )
 
+type (
+	Name        string
+	ParseString string
+	Path        string
+)
+
 //go:embed namedivider-python/assets/kanji.csv
 var assets string
 
-func InitNameParser(parseString string, manager feature.KanjiFeatureManager) parser.NameParser {
+func InitNameParser(parseString ParseString, manager feature.KanjiFeatureManager) parser.NameParser {
 	return parser.NewNameParser(parser.Separator(parseString), manager)
 }
 
@@ -74,7 +80,7 @@ func InitKanjiFeatureManager() feature.KanjiFeatureManager {
 	}
 }
 
-func NameParse(out io.Writer, fullname string, parseString string) error {
+func ParseName(out io.Writer, fullname Name, parseString ParseString) error {
 	m := InitKanjiFeatureManager()
 	p := InitNameParser(parseString, m)
 

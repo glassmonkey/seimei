@@ -14,8 +14,8 @@ func TestRun(t *testing.T) {
 
 	type testdata struct {
 		name        string
-		inputName   string
-		inputParser string
+		inputName   seimei.Name
+		inputParser seimei.ParseString
 		want        string
 	}
 
@@ -58,7 +58,7 @@ func TestRun(t *testing.T) {
 			t.Parallel()
 			out := &bytes.Buffer{}
 
-			if err := seimei.Run(out, tt.inputName, tt.inputParser); err != nil {
+			if err := seimei.ParseName(out, tt.inputName, tt.inputParser); err != nil {
 				t.Fatalf("happen error: %v", err)
 			}
 

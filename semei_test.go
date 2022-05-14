@@ -98,9 +98,20 @@ func TestParseFile(t *testing.T) {
 			inputParser: " ",
 			want:        ``,
 			wantErrOut: `format error: [田中太郎 ]
-load line error: record on line 2: wrong number of fields
-load line error: record on line 3: wrong number of fields
-load line error: record on line 4: wrong number of fields
+load line error on line 2: record on line 2: wrong number of fields
+load line error on line 3: record on line 3: wrong number of fields
+load line error on line 4:: record on line 4: wrong number of fields
+`,
+		},
+		{
+			name:        "エラーが混入している",
+			inputPath:   "testdata/part_of_error.csv",
+			inputParser: " ",
+			want: `田中 太郎
+竈門 炭治郎
+中曽根 康弘
+`,
+			wantErrOut: `parse error on line 2: parse error: name length needs at least 2 chars
 `,
 		},
 	}

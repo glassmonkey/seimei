@@ -2,6 +2,7 @@ package seimei_test
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"github.com/glassmonkey/seimei"
@@ -9,7 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestRun(t *testing.T) {
+func TestParseName(t *testing.T) {
 	t.Parallel()
 
 	type testdata struct {
@@ -135,6 +136,59 @@ load line error on line 4: record on line 4: wrong number of fields
 			}
 		})
 	}
+}
+
+func TestParseFile_LargeFile(t *testing.T) {
+	t.Parallel()
+
+	t.Run("巨大なファイル(rows=100000)がパースできる", func(t *testing.T) {
+		t.Parallel()
+
+		stdout := &bytes.Buffer{}
+		stderr := &bytes.Buffer{}
+		// Since the test data is repetition of the same text, slice is used to generate the want value.
+		lt := "竈門 炭治郎"
+		size := 100000
+		lts := make([]string, size)
+		for i := 0; i < size; i++ {
+			lts[i] = lt
+		}
+		lts = append(lts, "")
+		want := strings.Join(lts, "\n")
+
+		if err := seimei.ParseFile(stdout, stderr, "testdata/large.csv", " "); err != nil {
+			t.Fatalf("happen error: %v", err)
+		}
+		if diff := cmp.Diff(stdout.String(), want); diff != "" {
+			t.Errorf("failed to test. diff: %s", diff)
+		}
+		if diff := cmp.Diff(stderr.String(), ""); diff != "" {
+			t.Errorf("failed to test. diff: %s", diff)
+		}
+	})
+}
+
+func TestParseFile_NotFoundFile(t *testing.T) {
+	t.Parallel()
+
+	t.Run("存在しないファイルを指定", func(t *testing.T) {
+		t.Parallel()
+
+		stdout := &bytes.Buffer{}
+		stderr := &bytes.Buffer{}
+		wantErrMsg := "happen error load file: fatal error file load: open testdata/not_found.csv: no such file or directory"
+		err := seimei.ParseFile(stdout, stderr, "testdata/not_found.csv", " ")
+		if diff := cmp.Diff(err.Error(), wantErrMsg); diff != "" {
+			t.Errorf("failed to test. diff: %s", diff)
+		}
+		if diff := cmp.Diff(stdout.String(), ""); diff != "" {
+			t.Errorf("failed to test. diff: %s", diff)
+		}
+		if diff := cmp.Diff(stderr.String(), ""); diff != "" {
+			t.Errorf("failed to test. diff: %s", diff)
+		}
+
+	})
 }
 
 func TestInitKanjiFeatureManager(t *testing.T) {

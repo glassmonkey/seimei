@@ -113,7 +113,7 @@ func ParseFile(out, stderr io.Writer, path Path, parseString ParseString) error 
 
 	r, err := InitReader(path)
 	if err != nil {
-		return fmt.Errorf("happen error parse: %w", err)
+		return fmt.Errorf("happen error load file: %w", err)
 	}
 
 	for c := 1; ; c++ {

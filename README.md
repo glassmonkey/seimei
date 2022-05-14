@@ -21,6 +21,8 @@ go install github.com/glassmonkey/seimei/cmd/seimei@latest
 
 ```bash
 $ seimei -h
+  -file string
+        path to text file of separated by break line undivided name list (ex. /tmp/undivided_name.txt)
   -name string
         separate full name(ex. 田中太郎)
   -parse string
@@ -35,6 +37,26 @@ $ seimei -name 竈門炭治郎
 
 $ seimei -name 竈門禰豆子 -parse @
 竈門@禰豆子
+```
+
+```
+$ cat /tmp/kimetsu.txt
+竈門炭治郎
+竈門禰豆子
+我妻善逸
+嘴平伊之助
+
+$ seimei -file /tmp/kimetsu.txt
+竈門 炭治郎
+竈門 禰豆子
+我妻 善逸
+嘴平 伊之助
+
+$ seimei -file /tmp/kimetsu.txt -parse @
+竈門@炭治郎
+竈門@禰豆子
+我妻@善逸
+嘴平@伊之助
 ```
 
 # Licence

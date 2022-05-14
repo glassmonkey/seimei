@@ -53,13 +53,13 @@ func Run(args []string, stdout, stderr io.Writer) error {
 
 	switch mode {
 	case NameParse:
-		n, p, err := SetFlagForName(args)
+		n, p, err := SetFlagForName(args[2:])
 		if err != nil {
 			return fmt.Errorf("sub command: %s: %w", os.Args[1], err)
 		}
 		return ParseName(stdout, stderr, n, p)
 	case FileParse:
-		f, p, err := SetFlagForFile(args)
+		f, p, err := SetFlagForFile(args[2:])
 		if err != nil {
 			return fmt.Errorf("sub command: %s: %w", os.Args[1], err)
 		}

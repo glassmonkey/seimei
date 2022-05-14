@@ -154,14 +154,18 @@ func TestRun(t *testing.T) {
 
 	tests := []testdata{
 		{
-			name:  "サンプル",
+			name:  "名前指定",
 			input: []string{"seimei", "name", "-name", "田中太郎"},
 			want:  "田中 太郎\n",
 		},
 		{
 			name:  "ファイル経由の実行",
 			input: []string{"seimei", "file", "-file", "testdata/success.csv"},
-			want:  "田中/太郎\n",
+			want: `田中 太郎
+乙 一
+竈門 炭治郎
+中曽根 康弘
+`,
 		},
 	}
 
@@ -179,7 +183,7 @@ func TestRun(t *testing.T) {
 			if stdout.String() != tt.want {
 				t.Errorf("failed to test. got: %s, want: %s", stdout, tt.want)
 			}
-			if stderr.String() != tt.want {
+			if stderr.String() != tt.wantErrMsg {
 				t.Errorf("failed to test. got: %s, want: %s", stderr, tt.wantErrMsg)
 			}
 		})

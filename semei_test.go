@@ -97,10 +97,10 @@ func TestParseFile(t *testing.T) {
 			inputPath:   "testdata/invalid_format.csv",
 			inputParser: " ",
 			want:        ``,
-			wantErrOut: `format error: [田中太郎 ]
+			wantErrOut: `format error on line 1: [田中太郎 ]
 load line error on line 2: record on line 2: wrong number of fields
 load line error on line 3: record on line 3: wrong number of fields
-load line error on line 4:: record on line 4: wrong number of fields
+load line error on line 4: record on line 4: wrong number of fields
 `,
 		},
 		{
@@ -127,11 +127,11 @@ load line error on line 4:: record on line 4: wrong number of fields
 				t.Fatalf("happen error: %v", err)
 			}
 
-			if stdout.String() != tt.want {
-				t.Errorf("failed to test. got: %s, want: %s", stdout, tt.want)
+			if diff := cmp.Diff(stdout.String(), tt.want); diff != "" {
+				t.Errorf("failed to test. diff: %s", diff)
 			}
-			if stderr.String() != tt.wantErrOut {
-				t.Errorf("failed to test. got: %s, want: %s", stderr, tt.wantErrOut)
+			if diff := cmp.Diff(stderr.String(), tt.wantErrOut); diff != "" {
+				t.Errorf("failed to test. diff: %s", diff)
 			}
 		})
 	}

@@ -69,6 +69,63 @@ func TestRun(t *testing.T) {
 	}
 }
 
+func TestParseFile(t *testing.T) {
+	t.Parallel()
+
+	type testdata struct {
+		name        string
+		inputPath   seimei.Path
+		inputParser seimei.ParseString
+		want        string
+		wantErrOut  string
+	}
+
+	tests := []testdata{
+		{
+			name:        "すべて成功",
+			inputPath:   "testdata/success.csv",
+			inputParser: " ",
+			want: `田中 太郎
+乙 一
+竈門 炭治郎
+中曽根 康弘
+`,
+			wantErrOut: "",
+		},
+		{
+			name:        "フォーマットが正しくない",
+			inputPath:   "testdata/invalid_format.csv",
+			inputParser: " ",
+			want:        ``,
+			wantErrOut: `format error: [田中太郎 ]
+load line error: record on line 2: wrong number of fields
+load line error: record on line 3: wrong number of fields
+load line error: record on line 4: wrong number of fields
+`,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			stdout := &bytes.Buffer{}
+			stderr := &bytes.Buffer{}
+
+			if err := seimei.ParseFile(stdout, stderr, tt.inputPath, tt.inputParser); err != nil {
+				t.Fatalf("happen error: %v", err)
+			}
+
+			if stdout.String() != tt.want {
+				t.Errorf("failed to test. got: %s, want: %s", stdout, tt.want)
+			}
+			if stderr.String() != tt.wantErrOut {
+				t.Errorf("failed to test. got: %s, want: %s", stderr, tt.wantErrOut)
+			}
+		})
+	}
+}
+
 func TestInitKanjiFeatureManager(t *testing.T) {
 	t.Parallel()
 

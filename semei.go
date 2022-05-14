@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"strings"
 
@@ -80,6 +81,15 @@ func InitKanjiFeatureManager() feature.KanjiFeatureManager {
 	}
 }
 
+func InitReader(path Path) (*csv.Reader, error) {
+	f, err := os.Open(string(path))
+	if err != nil {
+		return nil, fmt.Errorf("fatal error file load: %v", err)
+	}
+
+	return csv.NewReader(f), nil
+}
+
 func ParseName(out io.Writer, fullname Name, parseString ParseString) error {
 	m := InitKanjiFeatureManager()
 	p := InitNameParser(parseString, m)
@@ -92,6 +102,40 @@ func ParseName(out io.Writer, fullname Name, parseString ParseString) error {
 	_, err = fmt.Fprintf(out, "%s\n", name.String())
 	if err != nil {
 		return fmt.Errorf("happen error write stdout: %w", err)
+	}
+
+	return nil
+}
+
+func ParseFile(out, stderr io.Writer, path Path, parseString ParseString) error {
+	m := InitKanjiFeatureManager()
+	p := InitNameParser(parseString, m)
+
+	r, err := InitReader(path)
+	if err != nil {
+		return fmt.Errorf("happen error parse: %w", err)
+	}
+
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Fprintf(stderr, "load line error: %v\n", err)
+			continue
+		}
+		if len(record) != 1 {
+			fmt.Fprintf(stderr, "format error: %v\n", record)
+			continue
+		}
+
+		name, err := p.Parse(parser.FullName(record[0]))
+		if err != nil {
+			fmt.Fprintf(stderr, "parse erorr: %v\n", err)
+		}
+
+		fmt.Fprintf(out, "%s\n", name.String())
 	}
 
 	return nil

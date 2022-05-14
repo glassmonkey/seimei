@@ -30,7 +30,6 @@ func main() {
 
 	if *file != "" {
 		data, err := os.ReadFile(*file)
-
 		if err != nil {
 			fmt.Printf("raised error: %s\n", err)
 			os.Exit(1)
@@ -40,7 +39,7 @@ func main() {
 		undividedNames := strings.Split(trimmed, "\n")
 
 		for index, name := range undividedNames {
-			if err := seimei.Run(os.Stdout, name, *parse); err != nil {
+			if err := seimei.NameParse(os.Stdout, name, *parse); err != nil {
 				fmt.Printf("[Line:%d] raised error : %s\n", index+1, err)
 				os.Exit(1)
 			}
@@ -49,7 +48,7 @@ func main() {
 		return
 	}
 
-	if err := seimei.Run(os.Stdout, *name, *parse); err != nil {
+	if err := seimei.NameParse(os.Stdout, *name, *parse); err != nil {
 		fmt.Printf("raised error: %s\n", err)
 		os.Exit(1)
 	}

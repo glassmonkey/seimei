@@ -74,7 +74,7 @@ func InitKanjiFeatureManager() feature.KanjiFeatureManager {
 	}
 }
 
-func Run(out io.Writer, fullname string, parseString string) error {
+func NameParse(out io.Writer, fullname string, parseString string) error {
 	m := InitKanjiFeatureManager()
 	p := InitNameParser(parseString, m)
 

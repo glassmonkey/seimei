@@ -21,3 +21,5 @@ linters:
     - lll
     - gomnd
     - gochecknoglobals
+    - nlreturn
+    - wsl

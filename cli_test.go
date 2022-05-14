@@ -1,6 +1,7 @@
 package seimei_test
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -136,6 +137,50 @@ func TestSetFlagForFile(t *testing.T) {
 			}
 			if gotParseString != tt.wantParseString {
 				t.Errorf("failed to test. got: %s, want: %s", gotParseString, tt.wantParseString)
+			}
+		})
+	}
+}
+
+func TestRun(t *testing.T) {
+	t.Parallel()
+
+	type testdata struct {
+		name       string
+		input      []string
+		want       string
+		wantErrMsg string
+	}
+
+	tests := []testdata{
+		{
+			name:  "サンプル",
+			input: []string{"seimei", "name", "-name", "田中太郎"},
+			want:  "田中 太郎\n",
+		},
+		{
+			name:  "ファイル経由の実行",
+			input: []string{"seimei", "file", "-file", "testdata/success.csv"},
+			want:  "田中/太郎\n",
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			stdout := &bytes.Buffer{}
+			stderr := &bytes.Buffer{}
+
+			if err := seimei.Run(tt.input, stdout, stderr); err != nil {
+				t.Fatalf("happen error: %v", err)
+			}
+
+			if stdout.String() != tt.want {
+				t.Errorf("failed to test. got: %s, want: %s", stdout, tt.want)
+			}
+			if stderr.String() != tt.want {
+				t.Errorf("failed to test. got: %s, want: %s", stderr, tt.wantErrMsg)
 			}
 		})
 	}

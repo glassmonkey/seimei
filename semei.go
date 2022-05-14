@@ -90,13 +90,17 @@ func InitReader(path Path) (*csv.Reader, error) {
 	return csv.NewReader(f), nil
 }
 
-func ParseName(out io.Writer, fullname Name, parseString ParseString) error {
+func ParseName(out, stderr io.Writer, fullname Name, parseString ParseString) error {
 	m := InitKanjiFeatureManager()
 	p := InitNameParser(parseString, m)
 
 	name, err := p.Parse(parser.FullName(fullname))
 	if err != nil {
-		return fmt.Errorf("happen error parse: %w", err)
+		_, err := fmt.Fprintf(stderr, "%s\n", err.Error())
+		if err != nil {
+			return fmt.Errorf("happen error write stderr: %w", err)
+		}
+		return nil
 	}
 
 	_, err = fmt.Fprintf(out, "%s\n", name.String())

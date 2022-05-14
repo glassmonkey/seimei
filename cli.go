@@ -49,7 +49,7 @@ func Run(args []string, stdout, stderr io.Writer) error {
 	if len(args) < 2 {
 		return ErrRequiredSubCommand
 	}
-	mode := ParseMode(os.Args[1])
+	mode := ParseMode(args[1])
 
 	switch mode {
 	case NameParse:
@@ -57,7 +57,7 @@ func Run(args []string, stdout, stderr io.Writer) error {
 		if err != nil {
 			return fmt.Errorf("sub command: %s: %w", os.Args[1], err)
 		}
-		return ParseName(stdout, n, p)
+		return ParseName(stdout, stderr, n, p)
 	case FileParse:
 		f, p, err := SetFlagForFile(args)
 		if err != nil {

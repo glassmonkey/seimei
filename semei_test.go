@@ -18,6 +18,7 @@ func TestParseName(t *testing.T) {
 		inputName   seimei.Name
 		inputParser seimei.ParseString
 		want        string
+		wantErrMsg  string
 	}
 
 	tests := []testdata{
@@ -51,20 +52,31 @@ func TestParseName(t *testing.T) {
 			inputParser: " ",
 			want:        "中曽根 康弘\n",
 		},
+		{
+			name:        "1文字は分割できない",
+			inputName:   "あ",
+			inputParser: " ",
+			want:        "",
+			wantErrMsg:  "parse error: name length needs at least 2 chars\n",
+		},
 	}
 
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			out := &bytes.Buffer{}
+			stdout := &bytes.Buffer{}
+			stderr := &bytes.Buffer{}
 
-			if err := seimei.ParseName(out, tt.inputName, tt.inputParser); err != nil {
+			if err := seimei.ParseName(stdout, stderr, tt.inputName, tt.inputParser); err != nil {
 				t.Fatalf("happen error: %v", err)
 			}
 
-			if out.String() != tt.want {
-				t.Errorf("failed to test. got: %s, want: %s", out, tt.want)
+			if stdout.String() != tt.want {
+				t.Errorf("failed to test. got: %s, want: %s", stdout, tt.want)
+			}
+			if stderr.String() != tt.wantErrMsg {
+				t.Errorf("failed to test. got: %s, want: %s", stderr, tt.wantErrMsg)
 			}
 		})
 	}

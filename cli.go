@@ -27,7 +27,7 @@ const (
 	ParseOption string  = "parse"
 )
 
-func BuildMainCmd() *cobra.Command {
+func BuildMainCmd(v, rev string) *cobra.Command {
 	c := cobra.Command{
 		Use: "seimei",
 		CompletionOptions: cobra.CompletionOptions{
@@ -36,6 +36,7 @@ func BuildMainCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Usage()
 		},
+		Version: fmt.Sprintf("%s(%s)", v, rev),
 	}
 	cobra.EnableCommandSorting = false
 	c.AddCommand(BuildNameCmd())
@@ -105,8 +106,8 @@ Provide the file path with full name list to the required flag (--file).
 	return &c
 }
 
-func Run() error {
-	cmd := BuildMainCmd()
+func Run(version, revision string) error {
+	cmd := BuildMainCmd(version, revision)
 	return cmd.Execute()
 }
 

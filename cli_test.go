@@ -2,6 +2,7 @@ package seimei_test
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"github.com/glassmonkey/seimei"
@@ -200,6 +201,8 @@ func TestRun(t *testing.T) {
 		wantOut    string
 		wantErrOut string
 	}
+	v := "0.0.0"
+	rev := "0abcdef"
 
 	tests := []testdata{
 		{
@@ -265,7 +268,8 @@ Available Commands:
   help        Help about any command
 
 Flags:
-  -h, --help   help for seimei
+  -h, --help      help for seimei
+  -v, --version   version for seimei
 
 Use "seimei [command] --help" for more information about a command.
 `,
@@ -283,10 +287,17 @@ Available Commands:
   help        Help about any command
 
 Flags:
-  -h, --help   help for seimei
+  -h, --help      help for seimei
+  -v, --version   version for seimei
 
 Use "seimei [command] --help" for more information about a command.
 `,
+		},
+		{
+			name:  "バージョン表記",
+			input: []string{"-v"},
+			wantOut: fmt.Sprintf(`seimei version 0.0.0(0abcdef)
+`),
 		},
 	}
 
@@ -296,7 +307,7 @@ Use "seimei [command] --help" for more information about a command.
 			t.Parallel()
 			stdout := &bytes.Buffer{}
 			stderr := &bytes.Buffer{}
-			sut := seimei.BuildMainCmd()
+			sut := seimei.BuildMainCmd(v, rev)
 			sut.SetOut(stdout)
 			sut.SetErr(stderr)
 			sut.SetArgs(tt.input)

@@ -13,7 +13,7 @@ var (
 )
 
 func main() {
-	if err := seimei.Run(); err != nil {
+	if err := seimei.Run(Version, Revision); err != nil {
 		fmt.Fprintf(os.Stderr, "raised error: %s\n", err)
 		os.Exit(1)
 	}

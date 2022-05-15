@@ -4,7 +4,7 @@ Version=$(shell git describe --tags --abbrev=0)
 Revision=$(shell git rev-parse --short HEAD)
 
 .PHONY: build
-build: version
+build:
 	go build -o dist/seimei cmd/seimei/main.go
 
 .PHONY: release

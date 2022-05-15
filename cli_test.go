@@ -210,7 +210,10 @@ func TestRun(t *testing.T) {
 		{
 			name:  "名前指定実行のヘルプ",
 			input: []string{"name", "-h"},
-			wantOut: `Usage:
+			wantOut: `It parse single full name.
+Provide the full name to be parsed with the required flag (--name).
+
+Usage:
   seimei name [flags]
 
 Flags:
@@ -231,7 +234,10 @@ Flags:
 		{
 			name:  "ファイル経由の実行のヘルプ",
 			input: []string{"file", "-h"},
-			wantOut: `Usage:
+			wantOut: `It bulk parse full name lit in the file.
+Provide the file path with full name list to the required flag (--file).
+
+Usage:
   seimei file [flags]
 
 Flags:
@@ -248,9 +254,9 @@ Flags:
   seimei [command]
 
 Available Commands:
-  file
+  file        It bulk parse full name lit in the file.
   help        Help about any command
-  name
+  name        It parse single full name.
 
 Flags:
   -h, --help   help for seimei
@@ -266,15 +272,14 @@ Use "seimei [command] --help" for more information about a command.
   seimei [command]
 
 Available Commands:
-  file
+  file        It bulk parse full name lit in the file.
   help        Help about any command
-  name
+  name        It parse single full name.
 
 Flags:
   -h, --help   help for seimei
 
 Use "seimei [command] --help" for more information about a command.
-
 `,
 		},
 	}

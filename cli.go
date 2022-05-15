@@ -44,7 +44,11 @@ func BuildMainCmd() *cobra.Command {
 
 func BuildNameCmd() *cobra.Command {
 	c := cobra.Command{
-		Use: "name",
+		Use:   "name",
+		Short: "It parse single full name.",
+		Long: `It parse single full name.
+Provide the full name to be parsed with the required flag (--name).
+`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			n, err := detectFlagForName(cmd)
 			if err != nil {
@@ -69,7 +73,11 @@ func BuildNameCmd() *cobra.Command {
 
 func BuildFileCmd() *cobra.Command {
 	c := cobra.Command{
-		Use: "file",
+		Use:   "file",
+		Short: "It bulk parse full name lit in the file.",
+		Long: `It bulk parse full name lit in the file.
+Provide the file path with full name list to the required flag (--file).
+`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			f, err := detectFlagForFile(cmd)
 			if err != nil {

@@ -76,7 +76,7 @@ func BuildFileCmd() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("flag parse error: %w", err)
 			}
-			return ParseFile(cmd.OutOrStdout(), cmd.OutOrStderr(), f, p)
+			return ParseFile(cmd.OutOrStdout(), cmd.ErrOrStderr(), f, p)
 		},
 	}
 	c.Flags().StringP(FileCmd.String(), "f", "", "/tmp/foo.csv")

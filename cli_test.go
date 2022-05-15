@@ -201,8 +201,7 @@ func TestRun(t *testing.T) {
 		wantOut    string
 		wantErrOut string
 	}
-	v := "0.0.0"
-	rev := "0abcdef"
+	seimei.VersionText = "devel"
 
 	tests := []testdata{
 		{
@@ -296,7 +295,7 @@ Use "seimei [command] --help" for more information about a command.
 		{
 			name:  "バージョン表記",
 			input: []string{"-v"},
-			wantOut: fmt.Sprintf(`seimei version 0.0.0(0abcdef)
+			wantOut: fmt.Sprintf(`seimei version devel
 `),
 		},
 	}
@@ -307,7 +306,7 @@ Use "seimei [command] --help" for more information about a command.
 			t.Parallel()
 			stdout := &bytes.Buffer{}
 			stderr := &bytes.Buffer{}
-			sut := seimei.BuildMainCmd(v, rev)
+			sut := seimei.BuildMainCmd()
 			sut.SetOut(stdout)
 			sut.SetErr(stderr)
 			sut.SetArgs(tt.input)

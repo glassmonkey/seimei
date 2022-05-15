@@ -4,10 +4,15 @@ import (
 	"errors"
 	"fmt"
 
+	// Using embed.
+	_ "embed"
+
 	"github.com/spf13/cobra"
 )
 
 var (
+	//go:embed version.txt
+	VersionText           string
 	ErrEmptyName          = errors.New("provide name is empty (ex. 田中太郎)")
 	ErrInvalidName        = errors.New("provide path is invalid")
 	ErrEmptyPath          = errors.New("provide path is empty (ex. /tmp/foo.csv)")
@@ -27,7 +32,7 @@ const (
 	ParseOption string  = "parse"
 )
 
-func BuildMainCmd(v, rev string) *cobra.Command {
+func BuildMainCmd() *cobra.Command {
 	c := cobra.Command{
 		Use: "seimei",
 		CompletionOptions: cobra.CompletionOptions{
@@ -36,7 +41,7 @@ func BuildMainCmd(v, rev string) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Usage()
 		},
-		Version: fmt.Sprintf("%s(%s)", v, rev),
+		Version: fmt.Sprintf(VersionText),
 	}
 	cobra.EnableCommandSorting = false
 	c.AddCommand(BuildNameCmd())
@@ -106,8 +111,8 @@ Provide the file path with full name list to the required flag (--file).
 	return &c
 }
 
-func Run(version, revision string) error {
-	cmd := BuildMainCmd(version, revision)
+func Run() error {
+	cmd := BuildMainCmd()
 	return cmd.Execute()
 }
 

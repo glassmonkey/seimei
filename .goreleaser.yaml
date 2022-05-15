@@ -9,8 +9,6 @@ builds:
     main: ./cmd/seimei
     ldflags:
       - -s -w
-      - -X main.Version={{.Version}}
-      - -X main.Revision={{.ShortCommit}}
     goos:
       - linux
       - windows

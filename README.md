@@ -44,7 +44,7 @@ Use "seimei [command] --help" for more information about a command
 $ seimei name --name 竈門炭治郎
 竈門 炭治郎
 
-$ seimei name --name 竈門禰豆子 -parse @
+$ seimei name --name 竈門禰豆子 --parse @
 竈門@禰豆子
 ```
 
@@ -61,7 +61,7 @@ $ seimei file --file /tmp/kimetsu.txt
 我妻 善逸
 嘴平 伊之助
 
-$ seimei file --file /tmp/kimetsu.txt -parse @
+$ seimei file --file /tmp/kimetsu.txt --parse @
 竈門@炭治郎
 竈門@禰豆子
 我妻@善逸

@@ -28,7 +28,7 @@ const (
 )
 
 func BuildMainCmd() *cobra.Command {
-	return &cobra.Command{
+	c := cobra.Command{
 		Use: "seimei",
 		CompletionOptions: cobra.CompletionOptions{
 			DisableDefaultCmd: true,
@@ -37,6 +37,9 @@ func BuildMainCmd() *cobra.Command {
 			return cmd.Usage()
 		},
 	}
+	c.AddCommand(BuildNameCmd())
+	c.AddCommand(BuildFileCmd())
+	return &c
 }
 
 func BuildNameCmd() *cobra.Command {
@@ -91,8 +94,6 @@ func BuildFileCmd() *cobra.Command {
 
 func Run() error {
 	cmd := BuildMainCmd()
-	cmd.AddCommand(BuildNameCmd())
-	cmd.AddCommand(BuildFileCmd())
 	return cmd.Execute()
 }
 

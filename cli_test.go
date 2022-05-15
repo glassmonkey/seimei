@@ -168,7 +168,7 @@ func TestBuildFileCmd(t *testing.T) {
 			sut.SetErr(stderr)
 			sut.SetArgs(tt.input)
 
-			_, gotErr := sut.ExecuteC()
+			gotErr := sut.Execute()
 			if tt.wantErrMsg == "" && gotErr != nil {
 				t.Fatalf("happen error: %v", gotErr)
 			}
@@ -197,25 +197,32 @@ func TestRun(t *testing.T) {
 	type testdata struct {
 		name       string
 		input      []string
-		want       string
-		wantErrMsg string
+		wantOut    string
+		wantErrOut string
 	}
 
 	tests := []testdata{
 		{
-			name:  "名前指定",
-			input: []string{"seimei", "name", "-name", "田中太郎"},
-			want:  "田中 太郎\n",
+			name:    "名前指定",
+			input:   []string{"name", "--name", "田中太郎"},
+			wantOut: "田中 太郎\n",
 		},
 		{
 			name:  "名前指定実行のヘルプ",
-			input: []string{"seimei", "name", "-h"},
-			want:  ``,
+			input: []string{"name", "-h"},
+			wantOut: `Usage:
+  seimei name [flags]
+
+Flags:
+  -h, --help           help for name
+  -n, --name string    田中太郎
+  -p, --parse string     (default " ")
+`,
 		},
 		{
 			name:  "ファイル経由の実行",
-			input: []string{"seimei", "file", "-file", "testdata/success.csv"},
-			want: `田中 太郎
+			input: []string{"file", "--file", "testdata/success.csv"},
+			wantOut: `田中 太郎
 乙 一
 竈門 炭治郎
 中曽根 康弘
@@ -223,8 +230,15 @@ func TestRun(t *testing.T) {
 		},
 		{
 			name:  "ファイル経由の実行のヘルプ",
-			input: []string{"seimei", "file", "-h"},
-			want:  ``,
+			input: []string{"file", "-h"},
+			wantOut: `Usage:
+  seimei file [flags]
+
+Flags:
+  -f, --file string    /tmp/foo.csv
+  -h, --help           help for file
+  -p, --parse string     (default " ")
+`,
 		},
 	}
 
@@ -234,16 +248,20 @@ func TestRun(t *testing.T) {
 			t.Parallel()
 			stdout := &bytes.Buffer{}
 			stderr := &bytes.Buffer{}
+			sut := seimei.BuildMainCmd()
+			sut.SetOut(stdout)
+			sut.SetErr(stderr)
+			sut.SetArgs(tt.input)
 
-			if err := seimei.Run(tt.input, stdout, stderr); err != nil {
+			if err := sut.Execute(); err != nil {
 				t.Fatalf("happen error: %v", err)
 			}
 
-			if stdout.String() != tt.want {
-				t.Errorf("failed to test. got: %s, want: %s", stdout, tt.want)
+			if diff := cmp.Diff(stdout.String(), tt.wantOut); diff != "" {
+				t.Errorf("failed to test on error. diff: %s", diff)
 			}
-			if stderr.String() != tt.wantErrMsg {
-				t.Errorf("failed to test. got: %s, want: %s", stderr, tt.wantErrMsg)
+			if diff := cmp.Diff(stderr.String(), tt.wantErrOut); diff != "" {
+				t.Errorf("failed to test on error. diff: %s", diff)
 			}
 		})
 	}

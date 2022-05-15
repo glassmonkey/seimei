@@ -3,6 +3,7 @@
 before:
   hooks:
     - go mod tidy
+    - make version
 builds:
   - env:
       - CGO_ENABLED=0

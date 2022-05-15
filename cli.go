@@ -55,6 +55,11 @@ func BuildNameCmd() *cobra.Command {
 		},
 	}
 	c.Flags().StringP(NameCmd.String(), "n", "", "田中太郎")
+	err := c.MarkFlagRequired(NameCmd.String())
+	// since name flag is set on above, it raise panic without returning an error.
+	if err != nil {
+		panic(err)
+	}
 	c.Flags().StringP(ParseOption, "p", " ", " ")
 	return &c
 }
@@ -75,6 +80,11 @@ func BuildFileCmd() *cobra.Command {
 		},
 	}
 	c.Flags().StringP(FileCmd.String(), "f", "", "/tmp/foo.csv")
+	err := c.MarkFlagRequired(FileCmd.String())
+	// since file flag is set on above, it raise panic without returning an error.
+	if err != nil {
+		panic(err)
+	}
 	c.Flags().StringP(ParseOption, "p", " ", " ")
 	return &c
 }

@@ -50,6 +50,7 @@ func BuildNameCmd() *cobra.Command {
 		Long: `It parse single full name.
 Provide the full name to be parsed with the required flag (--name).
 `,
+		Example: "seimei name --name 田中太郎",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			n, err := detectFlagForName(cmd)
 			if err != nil {
@@ -80,6 +81,7 @@ func BuildFileCmd() *cobra.Command {
 		Long: `It bulk parse full name lit in the file.
 Provide the file path with full name list to the required flag (--file).
 `,
+		Example: "seimei file --file /path/to/dir/foo.csv",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			f, err := detectFlagForFile(cmd)
 			if err != nil {
@@ -93,7 +95,7 @@ Provide the file path with full name list to the required flag (--file).
 		},
 	}
 	c.Flags().SortFlags = false
-	c.Flags().StringP(FileCmd.String(), "f", "", "/tmp/foo.csv")
+	c.Flags().StringP(FileCmd.String(), "f", "", "/path/to/dir/foo.csv")
 	err := c.MarkFlagRequired(FileCmd.String())
 	// since file flag is set on above, it raise panic without returning an error.
 	if err != nil {

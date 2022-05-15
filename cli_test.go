@@ -216,6 +216,9 @@ Provide the full name to be parsed with the required flag (--name).
 Usage:
   seimei name [flags]
 
+Examples:
+seimei name --name 田中太郎
+
 Flags:
   -n, --name string    田中太郎
   -p, --parse string     (default " ")
@@ -240,8 +243,11 @@ Provide the file path with full name list to the required flag (--file).
 Usage:
   seimei file [flags]
 
+Examples:
+seimei file --file /path/to/dir/foo.csv
+
 Flags:
-  -f, --file string    /tmp/foo.csv
+  -f, --file string    /path/to/dir/foo.csv
   -p, --parse string     (default " ")
   -h, --help           help for file
 `,

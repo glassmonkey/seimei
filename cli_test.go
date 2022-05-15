@@ -254,9 +254,9 @@ Flags:
   seimei [command]
 
 Available Commands:
+  name        It parse single full name.
   file        It bulk parse full name lit in the file.
   help        Help about any command
-  name        It parse single full name.
 
 Flags:
   -h, --help   help for seimei
@@ -272,9 +272,9 @@ Use "seimei [command] --help" for more information about a command.
   seimei [command]
 
 Available Commands:
+  name        It parse single full name.
   file        It bulk parse full name lit in the file.
   help        Help about any command
-  name        It parse single full name.
 
 Flags:
   -h, --help   help for seimei

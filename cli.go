@@ -37,6 +37,7 @@ func BuildMainCmd() *cobra.Command {
 			return cmd.Usage()
 		},
 	}
+	cobra.EnableCommandSorting = false
 	c.AddCommand(BuildNameCmd())
 	c.AddCommand(BuildFileCmd())
 	return &c

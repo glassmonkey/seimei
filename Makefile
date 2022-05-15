@@ -1,6 +1,6 @@
 
 
-Version=dev
+Version=$(shell git describe --tags --abbrev=0)
 Revision=$(shell git rev-parse --short HEAD)
 
 .PHONY: build
@@ -26,5 +26,10 @@ test-coverage:
 lint:
 	 golangci-lint run
 
+.PHONY: lint-fix
 lint-fix:
 	 golangci-lint run --fix
+
+ .PHONY: version
+version:
+	@echo "$(Version)-$(Revision)" > version.txt

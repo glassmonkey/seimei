@@ -2,62 +2,71 @@ package seimei_test
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
-
 	"github.com/glassmonkey/seimei"
+	"github.com/google/go-cmp/cmp"
 )
 
-func TestSetFlagForName(t *testing.T) {
+func TestBuildNameCmd(t *testing.T) {
 	type testdata struct {
-		name            string
-		input           []string
-		wantName        seimei.Name
-		wantParseString seimei.ParseString
-		wantErrMsg      string
+		name       string
+		input      []string
+		wantOut    string
+		wantErrOut string
+		wantErrMsg string
 	}
 
 	tests := []testdata{
 		{
-			name:            "基本",
-			input:           []string{"-name", "田中太郎"},
-			wantName:        "田中太郎",
-			wantParseString: " ",
+			name:    "基本",
+			input:   []string{"--name", "田中太郎"},
+			wantOut: "田中 太郎\n",
 		},
 		{
-			name:            "パース文字指定",
-			input:           []string{"-name", "田中太郎", "-parse", "@"},
-			wantName:        "田中太郎",
-			wantParseString: "@",
+			name:    "パース文字指定",
+			input:   []string{"--name", "田中太郎", "--parse", "@"},
+			wantOut: "田中@太郎\n",
 		},
 		{
-			name:            "--2個でも良い",
-			input:           []string{"--name", "田中太郎"},
-			wantName:        "田中太郎",
-			wantParseString: " ",
+			name:    "短縮指定でも良い",
+			input:   []string{"-n", "田中太郎", "-p", "/"},
+			wantOut: "田中/太郎\n",
 		},
 		{
 			name:       "指定がない",
-			input:      []string{"-name"},
-			wantErrMsg: "name command parse error: flag needs an argument: -name",
+			input:      []string{"--name"},
+			wantErrMsg: "flag needs an argument: --name",
+		},
+		{
+			name:       "未定義の短縮パラメータ利用",
+			input:      []string{"--name", "田中太郎", "-x"},
+			wantErrMsg: "unknown shorthand flag: 'x' in -x",
 		},
 		{
 			name:       "未定義のパラメータ利用",
-			input:      []string{"--name", "田中太郎", "-x"},
-			wantErrMsg: "name command parse error: flag provided but not defined: -x",
+			input:      []string{"--name", "田中太郎", "--any"},
+			wantErrMsg: "unknown flag: --any",
 		},
 		{
 			name:       "空",
 			input:      []string{},
-			wantErrMsg: "-name must be required (ex. 田中太郎)",
+			wantErrMsg: "required flag(s) \"name\" not set",
 		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			gotName, gotParseString, gotErr := seimei.SetFlagForName(tt.input)
+			stdout := &bytes.Buffer{}
+			stderr := &bytes.Buffer{}
+			sut := seimei.BuildNameCmd()
+			sut.SetOut(stdout)
+			sut.SetErr(stderr)
+			sut.SetArgs(tt.input)
+
+			_, gotErr := sut.ExecuteC()
 			if tt.wantErrMsg == "" && gotErr != nil {
 				t.Fatalf("happen error: %v", gotErr)
 			}
@@ -65,71 +74,102 @@ func TestSetFlagForName(t *testing.T) {
 				if gotErr == nil {
 					t.Fatal("happen no error")
 				}
-				if diff := cmp.Diff(tt.wantErrMsg, gotErr.Error()); diff != "" {
+				if diff := cmp.Diff(gotErr.Error(), tt.wantErrMsg); diff != "" {
 					t.Fatalf("failed to test on error. diff: %s", diff)
 				}
+				return
 			}
-
-			if gotName != tt.wantName {
-				t.Errorf("failed to test. got: %s, want: %s", gotName, tt.wantName)
+			if diff := cmp.Diff(stdout.String(), tt.wantOut); diff != "" {
+				t.Errorf("failed to test on error. diff: %s", diff)
 			}
-			if gotParseString != tt.wantParseString {
-				t.Errorf("failed to test. got: %s, want: %s", gotParseString, tt.wantParseString)
+			if diff := cmp.Diff(stderr.String(), tt.wantErrOut); diff != "" {
+				t.Errorf("failed to test on error. diff: %s", diff)
 			}
 		})
 	}
 }
 
-func TestSetFlagForFile(t *testing.T) {
+func TestBuildFileCmd(t *testing.T) {
 
 	type testdata struct {
-		name            string
-		input           []string
-		wantPath        seimei.Path
-		wantParseString seimei.ParseString
-		wantErrMsg      string
+		name       string
+		input      []string
+		wantOut    string
+		wantErrOut string
+		wantErrMsg string
 	}
 
 	tests := []testdata{
 		{
-			name:            "基本",
-			input:           []string{"-file", "/tmb/hoge.csv"},
-			wantPath:        "/tmb/hoge.csv",
-			wantParseString: " ",
+			name:  "基本",
+			input: []string{"--file", "./testdata/success.csv"},
+			wantOut: `田中 太郎
+乙 一
+竈門 炭治郎
+中曽根 康弘
+`,
 		},
 		{
-			name:            "パース文字指定",
-			input:           []string{"-file", "/tmb/hoge.csv", "-parse", "@"},
-			wantPath:        "/tmb/hoge.csv",
-			wantParseString: "@",
+			name:  "パース文字指定",
+			input: []string{"--file", "./testdata/success.csv", "--parse", "@"},
+			wantOut: `田中@太郎
+乙@一
+竈門@炭治郎
+中曽根@康弘
+`,
 		},
 		{
-			name:            "--2個でも良い",
-			input:           []string{"--file", "/tmb/hoge.csv"},
-			wantPath:        "/tmb/hoge.csv",
-			wantParseString: " ",
+			name:  "短縮指定でも良い",
+			input: []string{"-f", "./testdata/success.csv"},
+			wantOut: `田中 太郎
+乙 一
+竈門 炭治郎
+中曽根 康弘
+`,
+		},
+		{
+			name:  "実行時エラーが混ざる場合",
+			input: []string{"-f", "./testdata/part_of_error.csv"},
+			wantOut: `田中 太郎
+竈門 炭治郎
+中曽根 康弘
+`,
+			wantErrOut: `parse error on line 2: parse error: name length needs at least 2 chars
+`,
 		},
 		{
 			name:       "指定がない",
-			input:      []string{"-file"},
-			wantErrMsg: "file command parse error: flag needs an argument: -file",
+			input:      []string{"--file"},
+			wantErrMsg: "flag needs an argument: --file",
+		},
+		{
+			name:       "未定義の短縮パラメータ利用",
+			input:      []string{"--file", "/tmb/hoge.csv", "-x"},
+			wantErrMsg: "unknown shorthand flag: 'x' in -x",
 		},
 		{
 			name:       "未定義のパラメータ利用",
-			input:      []string{"--file", "/tmb/hoge.csv", "-x"},
-			wantErrMsg: "file command parse error: flag provided but not defined: -x",
+			input:      []string{"--file", "/tmb/hoge.csv", "--any"},
+			wantErrMsg: "unknown flag: --any",
 		},
 		{
 			name:       "空",
 			input:      []string{},
-			wantErrMsg: "-path must be required (ex. /tmp/hoge.csv)",
+			wantErrMsg: "required flag(s) \"file\" not set",
 		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			gotName, gotParseString, gotErr := seimei.SetFlagForFile(tt.input)
+			stdout := &bytes.Buffer{}
+			stderr := &bytes.Buffer{}
+			sut := seimei.BuildFileCmd()
+			sut.SetOut(stdout)
+			sut.SetErr(stderr)
+			sut.SetArgs(tt.input)
+
+			gotErr := sut.Execute()
 			if tt.wantErrMsg == "" && gotErr != nil {
 				t.Fatalf("happen error: %v", gotErr)
 			}
@@ -137,16 +177,16 @@ func TestSetFlagForFile(t *testing.T) {
 				if gotErr == nil {
 					t.Fatal("happen no error")
 				}
-				if diff := cmp.Diff(tt.wantErrMsg, gotErr.Error()); diff != "" {
+				if diff := cmp.Diff(gotErr.Error(), tt.wantErrMsg); diff != "" {
 					t.Fatalf("failed to test on error. diff: %s", diff)
 				}
+				return
 			}
-
-			if gotName != tt.wantPath {
-				t.Errorf("failed to test. got: %s, want: %s", gotName, tt.wantPath)
+			if diff := cmp.Diff(stdout.String(), tt.wantOut); diff != "" {
+				t.Errorf("failed to test on error. diff: %s", diff)
 			}
-			if gotParseString != tt.wantParseString {
-				t.Errorf("failed to test. got: %s, want: %s", gotParseString, tt.wantParseString)
+			if diff := cmp.Diff(stderr.String(), tt.wantErrOut); diff != "" {
+				t.Errorf("failed to test on error. diff: %s", diff)
 			}
 		})
 	}
@@ -158,25 +198,40 @@ func TestRun(t *testing.T) {
 	type testdata struct {
 		name       string
 		input      []string
-		want       string
-		wantErrMsg string
+		wantOut    string
+		wantErrOut string
 	}
+	v := "0.0.0"
+	rev := "0abcdef"
 
 	tests := []testdata{
 		{
-			name:  "名前指定",
-			input: []string{"seimei", "name", "-name", "田中太郎"},
-			want:  "田中 太郎\n",
+			name:    "名前指定",
+			input:   []string{"name", "--name", "田中太郎"},
+			wantOut: "田中 太郎\n",
 		},
 		{
 			name:  "名前指定実行のヘルプ",
-			input: []string{"seimei", "name", "-h"},
-			want:  ``,
+			input: []string{"name", "-h"},
+			wantOut: `It parse single full name.
+Provide the full name to be parsed with the required flag (--name).
+
+Usage:
+  seimei name [flags]
+
+Examples:
+seimei name --name 田中太郎
+
+Flags:
+  -n, --name string    田中太郎
+  -p, --parse string     (default " ")
+  -h, --help           help for name
+`,
 		},
 		{
 			name:  "ファイル経由の実行",
-			input: []string{"seimei", "file", "-file", "testdata/success.csv"},
-			want: `田中 太郎
+			input: []string{"file", "--file", "testdata/success.csv"},
+			wantOut: `田中 太郎
 乙 一
 竈門 炭治郎
 中曽根 康弘
@@ -184,8 +239,65 @@ func TestRun(t *testing.T) {
 		},
 		{
 			name:  "ファイル経由の実行のヘルプ",
-			input: []string{"seimei", "file", "-h"},
-			want:  ``,
+			input: []string{"file", "-h"},
+			wantOut: `It bulk parse full name lit in the file.
+Provide the file path with full name list to the required flag (--file).
+
+Usage:
+  seimei file [flags]
+
+Examples:
+seimei file --file /path/to/dir/foo.csv
+
+Flags:
+  -f, --file string    /path/to/dir/foo.csv
+  -p, --parse string     (default " ")
+  -h, --help           help for file
+`,
+		},
+		{
+			name:  "サブコマンドなしはヘルプが表示される",
+			input: []string{},
+			wantOut: `Usage:
+  seimei [flags]
+  seimei [command]
+
+Available Commands:
+  name        It parse single full name.
+  file        It bulk parse full name lit in the file.
+  help        Help about any command
+
+Flags:
+  -h, --help      help for seimei
+  -v, --version   version for seimei
+
+Use "seimei [command] --help" for more information about a command.
+`,
+		},
+		{
+			name:  "ヘルプが表示される",
+			input: []string{"-h"},
+			wantOut: `Usage:
+  seimei [flags]
+  seimei [command]
+
+Available Commands:
+  name        It parse single full name.
+  file        It bulk parse full name lit in the file.
+  help        Help about any command
+
+Flags:
+  -h, --help      help for seimei
+  -v, --version   version for seimei
+
+Use "seimei [command] --help" for more information about a command.
+`,
+		},
+		{
+			name:  "バージョン表記",
+			input: []string{"-v"},
+			wantOut: fmt.Sprintf(`seimei version 0.0.0(0abcdef)
+`),
 		},
 	}
 
@@ -195,16 +307,20 @@ func TestRun(t *testing.T) {
 			t.Parallel()
 			stdout := &bytes.Buffer{}
 			stderr := &bytes.Buffer{}
+			sut := seimei.BuildMainCmd(v, rev)
+			sut.SetOut(stdout)
+			sut.SetErr(stderr)
+			sut.SetArgs(tt.input)
 
-			if err := seimei.Run(tt.input, stdout, stderr); err != nil {
+			if err := sut.Execute(); err != nil {
 				t.Fatalf("happen error: %v", err)
 			}
 
-			if stdout.String() != tt.want {
-				t.Errorf("failed to test. got: %s, want: %s", stdout, tt.want)
+			if diff := cmp.Diff(stdout.String(), tt.wantOut); diff != "" {
+				t.Errorf("failed to test on error. diff: %s", diff)
 			}
-			if stderr.String() != tt.wantErrMsg {
-				t.Errorf("failed to test. got: %s, want: %s", stderr, tt.wantErrMsg)
+			if diff := cmp.Diff(stderr.String(), tt.wantErrOut); diff != "" {
+				t.Errorf("failed to test on error. diff: %s", diff)
 			}
 		})
 	}

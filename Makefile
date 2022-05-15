@@ -1,10 +1,15 @@
-.PHONY: build
+
 
 Version=dev
 Revision=$(shell git rev-parse --short HEAD)
 
+.PHONY: build
 build:
 	go build -o dist/seimei -ldflags "-X main.Version=$(Version) -X main.Revision=$(Revision)"  cmd/seimei/main.go
+
+.PHONY: release
+release:
+	goreleaser --snapshot --skip-publish --rm-dist
 
 .PHONY: test
 test:

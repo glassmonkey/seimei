@@ -1,86 +1,144 @@
 package seimei
 
 import (
-	"flag"
+	"errors"
 	"fmt"
-	"io"
 
-	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
 )
 
 var (
-	ErrRequiredSubCommand = errors.New("subcommand must be required")
-	ErrInvalidSubCommand  = errors.New("subcommand is not defined")
-	ErrRequiredName       = errors.New("-name must be required (ex. 田中太郎)")
-	ErrRequiredPath       = errors.New("-path must be required (ex. /tmp/hoge.csv)")
+	ErrEmptyName          = errors.New("provide name is empty (ex. 田中太郎)")
+	ErrInvalidName        = errors.New("provide path is invalid")
+	ErrEmptyPath          = errors.New("provide path is empty (ex. /tmp/foo.csv)")
+	ErrInvalidPath        = errors.New("provide path is invalid")
+	ErrInvalidParseString = errors.New("provide parse string is invalid")
 )
 
-type ParseMode string
+type CmdMode string
+
+func (c CmdMode) String() string {
+	return string(c)
+}
 
 const (
-	NameParse ParseMode = "name"
-	FileParse ParseMode = "file"
+	NameCmd     CmdMode = "name"
+	FileCmd     CmdMode = "file"
+	ParseOption string  = "parse"
 )
 
-func SetFlagForName(params []string) (Name, ParseString, error) {
-	nameCmd := flag.NewFlagSet("name", flag.ContinueOnError)
-	name := nameCmd.String("name", "", "separate full name(ex. 田中太郎)")
-	parse := nameCmd.String("parse", " ", "separate characters")
-	err := nameCmd.Parse(params)
-	if err != nil {
-		return "", "", fmt.Errorf("name command parse error: %w", err)
+func BuildMainCmd(v, rev string) *cobra.Command {
+	c := cobra.Command{
+		Use: "seimei",
+		CompletionOptions: cobra.CompletionOptions{
+			DisableDefaultCmd: true,
+		},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return cmd.Usage()
+		},
+		Version: fmt.Sprintf("%s(%s)", v, rev),
 	}
-
-	if *name == "" {
-		return "", "", ErrRequiredName
-	}
-
-	return Name(*name), ParseString(*parse), nil
+	cobra.EnableCommandSorting = false
+	c.AddCommand(BuildNameCmd())
+	c.AddCommand(BuildFileCmd())
+	return &c
 }
 
-func SetFlagForFile(params []string) (Path, ParseString, error) {
-	fileCmd := flag.NewFlagSet("file", flag.ContinueOnError)
-	path := fileCmd.String("file", "", "separate full name(ex. /tmp/hoge.csv)")
-	parse := fileCmd.String("parse", " ", "separate characters")
-	err := fileCmd.Parse(params)
+func BuildNameCmd() *cobra.Command {
+	c := cobra.Command{
+		Use:   "name",
+		Short: "It parse single full name.",
+		Long: `It parse single full name.
+Provide the full name to be parsed with the required flag (--name).
+`,
+		Example: "seimei name --name 田中太郎",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			n, err := detectFlagForName(cmd)
+			if err != nil {
+				return fmt.Errorf("flag parse error: %w", err)
+			}
+			p, err := detectFlagParseString(cmd)
+			if err != nil {
+				return fmt.Errorf("flag parse error: %w", err)
+			}
+			return ParseName(cmd.OutOrStdout(), cmd.OutOrStderr(), n, p)
+		},
+	}
+	c.Flags().SortFlags = false
+	c.Flags().StringP(NameCmd.String(), "n", "", "田中太郎")
+	err := c.MarkFlagRequired(NameCmd.String())
+	// since name flag is set on above, it raise panic without returning an error.
 	if err != nil {
-		return "", "", fmt.Errorf("file command parse error: %w", err)
+		panic(err)
 	}
-	if *path == "" {
-		return "", "", ErrRequiredPath
-	}
-
-	return Path(*path), ParseString(*parse), nil
+	c.Flags().StringP(ParseOption, "p", " ", " ")
+	return &c
 }
 
-func Run(args []string, stdout, stderr io.Writer) error {
-	if len(args) < 2 {
-		flag.Usage()
-		return ErrRequiredSubCommand
-	}
-	mode := ParseMode(args[1])
-
-	switch mode {
-	case NameParse:
-		n, p, err := SetFlagForName(args[2:])
-		if err != nil {
-			if errors.Is(err, flag.ErrHelp) {
-				return nil
+func BuildFileCmd() *cobra.Command {
+	c := cobra.Command{
+		Use:   "file",
+		Short: "It bulk parse full name lit in the file.",
+		Long: `It bulk parse full name lit in the file.
+Provide the file path with full name list to the required flag (--file).
+`,
+		Example: "seimei file --file /path/to/dir/foo.csv",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			f, err := detectFlagForFile(cmd)
+			if err != nil {
+				return fmt.Errorf("flag parse error: %w", err)
 			}
-			return fmt.Errorf("sub command: %s: %w", args[1], err)
-		}
-		return ParseName(stdout, stderr, n, p)
-	case FileParse:
-		f, p, err := SetFlagForFile(args[2:])
-		if err != nil {
-			if errors.Is(err, flag.ErrHelp) {
-				return nil
+			p, err := detectFlagParseString(cmd)
+			if err != nil {
+				return fmt.Errorf("flag parse error: %w", err)
 			}
-			return fmt.Errorf("sub command: %s: %w", args[1], err)
-		}
-		return ParseFile(stdout, stderr, f, p)
-
-	default:
-		return fmt.Errorf("sub command: %s: %w", args[1], ErrInvalidSubCommand)
+			return ParseFile(cmd.OutOrStdout(), cmd.ErrOrStderr(), f, p)
+		},
 	}
+	c.Flags().SortFlags = false
+	c.Flags().StringP(FileCmd.String(), "f", "", "/path/to/dir/foo.csv")
+	err := c.MarkFlagRequired(FileCmd.String())
+	// since file flag is set on above, it raise panic without returning an error.
+	if err != nil {
+		panic(err)
+	}
+	c.Flags().StringP(ParseOption, "p", " ", " ")
+	return &c
+}
+
+func Run(version, revision string) error {
+	cmd := BuildMainCmd(version, revision)
+	return cmd.Execute()
+}
+
+func detectFlagForName(cmd *cobra.Command) (Name, error) {
+	n, err := cmd.Flags().GetString(NameCmd.String())
+	if err != nil {
+		return "", ErrInvalidName
+	}
+	if n == "" {
+		return "", ErrEmptyName
+	}
+
+	return Name(n), nil
+}
+
+func detectFlagForFile(cmd *cobra.Command) (Path, error) {
+	n, err := cmd.Flags().GetString(FileCmd.String())
+	if err != nil {
+		return "", ErrInvalidPath
+	}
+	if n == "" {
+		return "", ErrEmptyPath
+	}
+
+	return Path(n), nil
+}
+
+func detectFlagParseString(cmd *cobra.Command) (ParseString, error) {
+	p, err := cmd.Flags().GetString(ParseOption)
+	if err != nil {
+		return "", ErrInvalidParseString
+	}
+	return ParseString(p), nil
 }

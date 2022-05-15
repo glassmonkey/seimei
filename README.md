@@ -21,12 +21,21 @@ go install github.com/glassmonkey/seimei/cmd/seimei@latest
 
 ```bash
 $ seimei -h
-  -file string
-        path to text file of separated by break line undivided name list (ex. /tmp/undivided_name.txt)
-  -name string
-        separate full name(ex. 田中太郎)
-  -parse string
-        separate characters (default " ")
+Usage:
+  seimei [flags]
+  seimei [command]
+
+Available Commands:
+  name        It parse single full name.
+  file        It bulk parse full name lit in the file.
+  help        Help about any command
+
+Flags:
+  -h, --help      help for seimei
+  -v, --version   version for seimei
+
+Use "seimei [command] --help" for more information about a command
+
 ```
 
 ## Example

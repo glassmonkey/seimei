@@ -217,9 +217,9 @@ Usage:
   seimei name [flags]
 
 Flags:
-  -h, --help           help for name
   -n, --name string    田中太郎
   -p, --parse string     (default " ")
+  -h, --help           help for name
 `,
 		},
 		{
@@ -242,8 +242,8 @@ Usage:
 
 Flags:
   -f, --file string    /tmp/foo.csv
-  -h, --help           help for file
   -p, --parse string     (default " ")
+  -h, --help           help for file
 `,
 		},
 		{

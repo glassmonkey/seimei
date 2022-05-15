@@ -61,6 +61,7 @@ Provide the full name to be parsed with the required flag (--name).
 			return ParseName(cmd.OutOrStdout(), cmd.OutOrStderr(), n, p)
 		},
 	}
+	c.Flags().SortFlags = false
 	c.Flags().StringP(NameCmd.String(), "n", "", "田中太郎")
 	err := c.MarkFlagRequired(NameCmd.String())
 	// since name flag is set on above, it raise panic without returning an error.
@@ -90,6 +91,7 @@ Provide the file path with full name list to the required flag (--file).
 			return ParseFile(cmd.OutOrStdout(), cmd.ErrOrStderr(), f, p)
 		},
 	}
+	c.Flags().SortFlags = false
 	c.Flags().StringP(FileCmd.String(), "f", "", "/tmp/foo.csv")
 	err := c.MarkFlagRequired(FileCmd.String())
 	// since file flag is set on above, it raise panic without returning an error.

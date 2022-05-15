@@ -240,6 +240,43 @@ Flags:
   -p, --parse string     (default " ")
 `,
 		},
+		{
+			name:  "サブコマンドなしはヘルプが表示される",
+			input: []string{},
+			wantOut: `Usage:
+  seimei [flags]
+  seimei [command]
+
+Available Commands:
+  file
+  help        Help about any command
+  name
+
+Flags:
+  -h, --help   help for seimei
+
+Use "seimei [command] --help" for more information about a command.
+`,
+		},
+		{
+			name:  "ヘルプが表示される",
+			input: []string{"-h"},
+			wantOut: `Usage:
+  seimei [flags]
+  seimei [command]
+
+Available Commands:
+  file
+  help        Help about any command
+  name
+
+Flags:
+  -h, --help   help for seimei
+
+Use "seimei [command] --help" for more information about a command.
+
+`,
+		},
 	}
 
 	for _, tt := range tests {

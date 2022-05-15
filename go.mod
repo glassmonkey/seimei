@@ -1,4 +1,4 @@
-module github.com/glassmonkey/seimei
+module github.com/glassmonkey/seimei/v2
 
 go 1.18
 

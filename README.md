@@ -68,7 +68,7 @@ $ seimei file --file /tmp/kimetsu.txt --parse @
 嘴平@伊之助
 ```
 
-# Licence
+# License
 [Mit](LICENSE)
 
 # Author

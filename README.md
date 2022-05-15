@@ -12,7 +12,7 @@ For implementation details, please check ([namedivider-python](https://github.co
 # Installation
 
 ```bash
-go install github.com/glassmonkey/seimei/cmd/seimei@latest
+go install github.com/glassmonkey/seimei/v2/cmd/seimei@latest
 ```
 
 # Usage

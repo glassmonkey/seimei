@@ -23,6 +23,12 @@ jobs:
           git tag ${{ github.event.inputs.version }}
           git push origin ${{ github.event.inputs.version }}
         if: ${{ github.event.inputs.version }} != ''
+      - name: display version
+        run: make version
+        if: ${{ github.event.inputs.version }} != ''
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: update version ${{ github.event.inputs.name }}
       - name: Set up Go
         uses: actions/setup-go@v3
         with:

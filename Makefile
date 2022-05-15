@@ -9,7 +9,7 @@ build:
 
 .PHONY: release
 release:
-	goreleaser --snapshot --skip-publish --rm-dist
+	goreleaser --snapshot --rm-dist
 
 .PHONY: test
 test:

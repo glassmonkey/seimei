@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"unicode/utf8"
 
-	"github.com/glassmonkey/seimei/feature"
+	"github.com/glassmonkey/seimei/v2/feature"
 )
 
 type Algorithm string

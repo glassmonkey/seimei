@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/glassmonkey/seimei"
-	"github.com/glassmonkey/seimei/feature"
-	"github.com/glassmonkey/seimei/parser"
+	"github.com/glassmonkey/seimei/v2"
+	"github.com/glassmonkey/seimei/v2/feature"
+	"github.com/glassmonkey/seimei/v2/parser"
 	"github.com/google/go-cmp/cmp"
 )
 

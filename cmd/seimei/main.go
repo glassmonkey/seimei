@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/glassmonkey/seimei"
+	"github.com/glassmonkey/seimei/v2"
 )
 
 var (

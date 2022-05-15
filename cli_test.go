@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/glassmonkey/seimei"
+	"github.com/glassmonkey/seimei/v2"
 	"github.com/google/go-cmp/cmp"
 )
 

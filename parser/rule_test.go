@@ -3,7 +3,7 @@ package parser_test
 import (
 	"testing"
 
-	"github.com/glassmonkey/seimei/parser"
+	"github.com/glassmonkey/seimei/v2/parser"
 	"github.com/google/go-cmp/cmp"
 )
 

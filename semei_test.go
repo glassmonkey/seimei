@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/glassmonkey/seimei"
-	"github.com/glassmonkey/seimei/feature"
+	"github.com/glassmonkey/seimei/v2"
+	"github.com/glassmonkey/seimei/v2/feature"
 	"github.com/google/go-cmp/cmp"
 )
 

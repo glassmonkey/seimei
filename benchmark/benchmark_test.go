@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/glassmonkey/seimei"
+	"github.com/glassmonkey/seimei/v2"
 )
 
 //go:embed sample.csv

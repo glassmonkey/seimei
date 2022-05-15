@@ -3,7 +3,7 @@ package parser
 import (
 	"fmt"
 
-	"github.com/glassmonkey/seimei/feature"
+	"github.com/glassmonkey/seimei/v2/feature"
 )
 
 const (

@@ -2,7 +2,7 @@ module github.com/glassmonkey/seimei/v2
 
 go 1.18
 
-require github.com/google/go-cmp v0.5.8
+require github.com/google/go-cmp v0.5.9
 
 require github.com/spf13/cobra v1.5.0
 

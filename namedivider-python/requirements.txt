@@ -1,1 +1,1 @@
-namedivider-python==0.1.0
+namedivider-python==0.2.2
